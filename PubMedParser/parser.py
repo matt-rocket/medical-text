@@ -10,7 +10,7 @@ def get_type(filepath):
     return root.attrib['article-type']
 
 
-root_folder = r"C:\Users\matias\Desktop\thesis\data\pubmed\articles.C-H"
+root_folder = r"C:\Users\matias\Desktop\thesis\data\pubmed\articles.I-N"
 
 types = {}
 hits = 0
@@ -30,7 +30,7 @@ for subdir, dirs, files in os.walk(root_folder):
         else:
             print hits,"/",total
 
-with open('case_report_list_C-H.txt','w') as outfile:
+with open('case_report_list_I-N.txt','w') as outfile:
     for filename in case_reports:
         outfile.write("%s\n" % filename)
 
