@@ -5,12 +5,13 @@ import xml.etree.ElementTree as ET
 
 
 def get_type(filepath):
-    tree = ET.parse(filepath)
+    # the strange prefix is a workaround to handle filepaths longer than 255 chars
+    tree = ET.parse(r"\\?\\" + filepath)
     root = tree.getroot()
     return root.attrib['article-type']
 
 
-root_folder = r"C:\Users\matias\Desktop\thesis\data\pubmed\articles.I-N"
+root_folder = r"C:\Users\matias\Desktop\thesis\data\pubmed\articles.O-Z"
 
 types = {}
 hits = 0
@@ -30,7 +31,7 @@ for subdir, dirs, files in os.walk(root_folder):
         else:
             print hits,"/",total
 
-with open('case_report_list_I-N.txt','w') as outfile:
+with open('case_report_list_O-Z.txt','w') as outfile:
     for filename in case_reports:
         outfile.write("%s\n" % filename)
 
