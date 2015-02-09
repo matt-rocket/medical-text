@@ -2,66 +2,11 @@ __author__ = 'matias'
 
 import xml.etree.ElementTree as ET
 from nltk import word_tokenize
-import os.path
-import pickle
-
-
-class TokenTrie(object):
-    def __init__(self):
-        self.path = {}
-        # try to load from cache
-        if os.path.isfile("trie.cache"):
-            try:
-                print "loading trie cache.."
-                self.path = pickle.load(open("trie.cache"))
-            except:
-                raise IOError("not good!")
-            print "succesfully loaded trie cache.."
-
-    def is_empty(self):
-        return self.path == {}
-
-    def add(self,seq):
-        head = self.path
-        for token in seq:
-            if head.get(token):
-                head = head[token]
-            else:
-                head[token] = {}
-                head = head[token]
-        head[True] = True
-
-    def save_to_cache(self):
-        with open("trie.cache",'w') as outfile:
-            pickle.dump(self.path, outfile)
-
-    def scan(self,seq):
-        found_seqs = []
-        while seq:
-            token = seq.pop(0)
-            if token in self.path:
-                # try to find a match
-                match = [token]
-                step = 0
-                head = self.path[token]
-                if True in head and match:
-                    # pass list by value
-                    found_seqs.append(match[:])
-                while len(seq)>step and seq[step] in head:
-                    print seq[step]
-                    match.append(seq[step])
-                    head = head[seq[step]]
-                    step += 1
-                    if True in head:
-                        found_seqs.append(match)
-        # get longest sequence
-        return found_seqs
-
-
+from trie import TokenTrie
 
 class DiseaseExtractor(object):
     def __init__(self):
-        self.trie = TokenTrie()
+        self.trie = TokenTrie(name="disease")
         if self.trie.is_empty():
             disease_names = open('../../data/UMLS/diseases.txt').read().split('\n')
             count = 0
@@ -74,10 +19,29 @@ class DiseaseExtractor(object):
     def extract(self, text):
         return self.trie.scan(word_tokenize(text))
 
+class SymptomExtractor(object):
+    def __init__(self):
+        self.trie = TokenTrie(name="symptoms")
+        if self.trie.is_empty():
+            symptoms = open('../../data/UMLS/symptoms.txt').read().split('\n')
+            count = 0
+            for symptom in symptoms:
+                (code,name) = symptom.split("\t")
+                self.trie.add(word_tokenize(name))
+                print name
+                count += 1
+            self.trie.save_to_cache()
+
+    def extract(self, text):
+        return self.trie.scan(word_tokenize(text))
+
 class CaseReports(object):
-    def __init__(self,section='A-B', filename=None):
-        with open("case_report_list_%s.txt" % section) as infile:
-            self.filenames = infile.read().split("\n")
+    def __init__(self, filename=None):
+        sections = ['A-B', 'C-H', 'I-N', 'O-Z']
+        self.filenames = []
+        for section in sections:
+            with open("case_report_list_%s.txt" % section) as infile:
+                self.filenames += infile.read().split("\n")
         if filename:
             self.filenames = [filename]
 
@@ -93,32 +57,17 @@ class CaseReports(object):
             else:
                 continue
 
-
-
-
-ab_cases = CaseReports('A-B', r"C:\Users\matias\Desktop\thesis\data\pubmed\articles.A-B\Ann_Gastroenterol\Ann_Gastroenterol_2013_26(2)_165.nxml")
+cases = CaseReports()
 d_extractor = DiseaseExtractor()
+s_extractor = SymptomExtractor()
 
+count = 0
+for body in cases:
+    count += 1
+    diseases = [" ".join(words) for words in d_extractor.extract(body)]
+    symptoms = [" ".join(words) for words in s_extractor.extract(body)]
+    print diseases
+    print symptoms
+    if count > 150:
+        break
 
-
-for body in ab_cases:
-    print body
-    print d_extractor.extract(body)
-
-
-"""
-for i in range(50):
-    t = TokenTrie()
-    t.add(word_tokenize("slemt lunge prut"))
-    t.add(word_tokenize("slemt slemhed"))
-    t.add(word_tokenize("slemt"))
-    t.add(word_tokenize("bums"))
-    t.add(word_tokenize("lunge prut"))
-
-    text = "bums slemt det er et eksempel af slemt slemhed i maven og slemt lunge prut i halsen"
-    hits = t.scan(word_tokenize(text))
-
-    print text
-    print hits
-    print ""
-"""
