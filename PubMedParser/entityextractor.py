@@ -2,7 +2,7 @@ __author__ = 'matias'
 
 import xml.etree.ElementTree as ET
 from nltk import word_tokenize
-from trie import TokenTrie
+from irdatastructs import TokenTrie
 
 class DiseaseExtractor(object):
     def __init__(self):
@@ -57,17 +57,12 @@ class CaseReports(object):
             else:
                 continue
 
-cases = CaseReports()
-d_extractor = DiseaseExtractor()
-s_extractor = SymptomExtractor()
+class RareDiseases(set):
+    def __init__(self):
+        tree = ET.parse("../../data/orphanet/rare_diseases.xml")
+        root = tree.getroot()
+        names = root.findall('./DisorderList/Disorder/Name')
+        for name in names:
+            print name.text
 
-count = 0
-for body in cases:
-    count += 1
-    diseases = [" ".join(words) for words in d_extractor.extract(body)]
-    symptoms = [" ".join(words) for words in s_extractor.extract(body)]
-    print diseases
-    print symptoms
-    if count > 150:
-        break
 

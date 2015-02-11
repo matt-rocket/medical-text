@@ -55,3 +55,23 @@ class TokenTrie(object):
         # get longest sequence
         return found_seqs
 
+
+class InvertedIndex(object):
+    def __init__(self, name):
+        self.index = {}
+        self.cache_filename = name + ".index.cache"
+
+    def add(self, terms, doc):
+        for term in terms:
+            if term not in self.index:
+                self.index[term] = [doc]
+            else:
+                self.index[term].append(doc)
+
+    def save(self):
+        with open(self.cache_filename, 'w') as outfile:
+            pickle.dump(self.index, outfile)
+
+    def load(self):
+        with open(self.cache_filename, 'r') as infile:
+            self.index = pickle.load(infile)
