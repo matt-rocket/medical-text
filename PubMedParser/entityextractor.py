@@ -53,7 +53,7 @@ class CaseReports(object):
             body_node = root.find('./body')
             if body_node is not None:
                 body = ET.tostring(body_node,encoding='utf8',method='text').replace("\n", " ")
-                yield body
+                yield (title, body, filename)
             else:
                 continue
 
@@ -64,5 +64,3 @@ class RareDiseases(set):
         names = root.findall('./DisorderList/Disorder/Name')
         for name in names:
             print name.text
-
-

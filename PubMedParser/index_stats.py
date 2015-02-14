@@ -2,7 +2,6 @@ __author__ = 'matias'
 
 from irdatastructs import InvertedIndex
 from matplotlib import pyplot as plt
-from math import log
 
 index = InvertedIndex("disease")
 index.load()
@@ -18,5 +17,6 @@ for e in ranking:
 
 print len(ranking)
 
-plt.plot([log(tup[1]) for tup in ranking[:-1]])
+# plot IDF for all disease terms
+plt.plot([1.0/tup[1] for tup in ranking[:-1]])
 plt.show()
