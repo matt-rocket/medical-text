@@ -1,7 +1,7 @@
 __author__ = 'matias'
 
 import xml.etree.ElementTree as ET
-from tokenize import tokenize
+from pubmed_tokenize import tokenize
 from irdatastructs import TokenTrie
 
 class DiseaseExtractor(object):
