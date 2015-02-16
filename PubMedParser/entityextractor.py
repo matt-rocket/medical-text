@@ -1,7 +1,7 @@
 __author__ = 'matias'
 
 import xml.etree.ElementTree as ET
-from nltk import word_tokenize
+from tokenize import tokenize
 from irdatastructs import TokenTrie
 
 class DiseaseExtractor(object):
@@ -11,13 +11,13 @@ class DiseaseExtractor(object):
             disease_names = open('../../data/UMLS/diseases.txt').read().split('\n')
             count = 0
             for disease in disease_names:
-                self.trie.add(word_tokenize(disease))
+                self.trie.add(tokenize(disease))
                 print disease
                 count += 1
             self.trie.save_to_cache()
 
     def extract(self, text):
-        return self.trie.scan(word_tokenize(text))
+        return self.trie.scan(tokenize(text))
 
 class SymptomExtractor(object):
     def __init__(self):
@@ -27,13 +27,13 @@ class SymptomExtractor(object):
             count = 0
             for symptom in symptoms:
                 (code,name) = symptom.split("\t")
-                self.trie.add(word_tokenize(name))
+                self.trie.add(tokenize(name))
                 print name
                 count += 1
             self.trie.save_to_cache()
 
     def extract(self, text):
-        return self.trie.scan(word_tokenize(text))
+        return self.trie.scan(tokenize(text))
 
 class CaseReports(object):
     def __init__(self, filename=None):
