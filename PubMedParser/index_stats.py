@@ -12,8 +12,10 @@ for term in index.index:
 
 ranking.sort(key=lambda tup:tup[1])
 
+count = 1
 for e in ranking:
-    print e
+    print count, e
+    count += 1
 
 print len(ranking)
 

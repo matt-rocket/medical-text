@@ -1,19 +1,19 @@
 __author__ = 'matias'
 
-from entityextractor import CaseReports, DiseaseExtractor, SymptomExtractor
+from entityextractor import CaseReportLibrary, DiseaseExtractor, SymptomExtractor
 from irdatastructs import InvertedIndex
 
 d_index = InvertedIndex("disease")
 s_index = InvertedIndex("symptom")
 
-cases = CaseReports()
+cases = CaseReportLibrary()
 d_extractor = DiseaseExtractor()
 s_extractor = SymptomExtractor()
 
 
 count = 0
 max_count = 1
-for (title, body, filename) in cases:
+for (title,body,filename,keywords,abstract) in cases:
     count += 1
     symptoms = [" ".join(words) for words in s_extractor.extract(body)]
     diseases = [" ".join(words) for words in d_extractor.extract(body)]

@@ -1,19 +1,24 @@
 __author__ = 'matias'
 
-from entityextractor import CaseReports, DiseaseExtractor
+from entityextractor import CaseReport, CaseReportLibrary, DiseaseExtractor
 import solr
 
 solr_con = solr.SolrConnection('http://localhost:8983/solr')
 
 d_extractor = DiseaseExtractor()
 
-case_reports = CaseReports()
+case_reports = CaseReportLibrary()
 
 count = 0
 hits = 0
-for (title,body,filename) in case_reports:
+for case_report in case_reports:
     count += 1
-    if title and d_extractor.extract(title):
-        hits += 1
-        print hits,"/",count,title
-        print d_extractor.extract(title)
+    print "added",count
+    solr_con.add(_commit=False, id=count,
+                 title=case_report.title.decode('utf-8'),
+                 description=case_report.abstract.decode('utf-8'),
+                 text=case_report.body.decode('utf-8'),
+                 keywords=",".join(case_report.mesh_terms).decode('utf-8'),
+                 resourcename=case_report.filename,
+                 )
+solr_con.commit()

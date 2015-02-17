@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 from pubmed_tokenize import tokenize
 from irdatastructs import TokenTrie
 
+
 class DiseaseExtractor(object):
     def __init__(self):
         self.trie = TokenTrie(name="disease")
@@ -19,6 +20,7 @@ class DiseaseExtractor(object):
     def extract(self, text):
         return self.trie.scan(tokenize(text))
 
+
 class SymptomExtractor(object):
     def __init__(self):
         self.trie = TokenTrie(name="symptoms")
@@ -26,7 +28,7 @@ class SymptomExtractor(object):
             symptoms = open('../../data/UMLS/symptoms.txt').read().split('\n')
             count = 0
             for symptom in symptoms:
-                (code,name) = symptom.split("\t")
+                (code, name) = symptom.split("\t")
                 self.trie.add(tokenize(name))
                 print name
                 count += 1
@@ -35,7 +37,8 @@ class SymptomExtractor(object):
     def extract(self, text):
         return self.trie.scan(tokenize(text))
 
-class CaseReports(object):
+
+class CaseReportLibrary(object):
     def __init__(self, filename=None):
         sections = ['A-B', 'C-H', 'I-N', 'O-Z']
         self.filenames = []
@@ -49,13 +52,41 @@ class CaseReports(object):
         for filename in self.filenames:
             tree = ET.parse(filename)
             root = tree.getroot()
-            title = root.find('./front/article-meta/title-group/article-title').text
+            title = root.find('./front/article-meta/title-group/article-title')
+            keywords = root.findall('./front/article-meta/kwd-group/kwd')
+            abstract = root.find('./front/article-meta/abstract')
+            if title is not None:
+                title = ET.tostring(title, encoding='utf8', method='text')
+            if abstract is not None:
+                abstract = ET.tostring(abstract, encoding='utf8', method='text')
+            if keywords is not None:
+                keywords = [ET.tostring(kwd, encoding='utf8', method='text') for kwd in keywords]
             body_node = root.find('./body')
             if body_node is not None:
-                body = ET.tostring(body_node,encoding='utf8',method='text').replace("\n", " ")
-                yield (title, body, filename)
+                body = ET.tostring(body_node, encoding='utf8', method='text').replace("\n", " ")
+                yield CaseReport(title, body, filename, keywords, abstract)
             else:
                 continue
+
+
+class CaseReport(object):
+    def __init__(self, title, body, filename, mesh_terms, abstract):
+        self.title = title if title is not None else ""
+        self.body = body if body is not None else ""
+        self.abstract = abstract if abstract is not None else ""
+        self.filename = filename if filename is not None else ""
+        self.mesh_terms = mesh_terms if mesh_terms is not None else []
+
+    def get_entities(self, extractor):
+        if self.title or self.body or self.abstract:
+            sequences = extractor.extract(self.body) + extractor.extract(self.title) + extractor.extract(self.abstract)
+            for term in self.mesh_terms:
+                sequences += extractor.extract(term)
+            entities = list(set([" ".join(seq) for seq in sequences]))
+            return entities
+        else:
+            return []
+
 
 class RareDiseases(set):
     def __init__(self):
