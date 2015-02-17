@@ -82,6 +82,10 @@ class CaseReport(object):
         self.mesh_terms = mesh_terms if mesh_terms is not None else []
 
     def get_entities(self, extractor):
+        """
+        :param extractor: the entity extractor
+        :return: list of strings
+        """
         if self.title or self.body or self.abstract:
             sequences = extractor.extract(self.body) + extractor.extract(self.title) + extractor.extract(self.abstract)
             for term in self.mesh_terms:
@@ -90,6 +94,12 @@ class CaseReport(object):
             return entities
         else:
             return []
+
+    def get_text(self):
+        """
+        :return: string containing all text in case report
+        """
+        return " ".join([self.title, " ".join(self.mesh_terms), self.abstract, self.body])
 
 
 class RareDiseases(set):

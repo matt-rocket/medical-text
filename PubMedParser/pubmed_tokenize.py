@@ -1,11 +1,16 @@
 __author__ = 'matias'
 
 from nltk import word_tokenize
+import os
 
 def tokenize(text):
     if text is None:
         return []
-    # TODO: remove MS Word curly quotes
-    #text = unicode(text).encode('utf-8').decode('ascii','ignore')
-    text = text.replace("\n"," ")
+    text = text.replace("\n", " ")
     return word_tokenize(text)
+
+def stopwords(listname):
+    filepath = os.path.join(*[os.path.dirname(__file__), 'data', listname+"_stopwords.txt"])
+    stopword_list = open(filepath,'r').read().split("\n")
+    return set(stopword_list)
+

@@ -1,22 +1,14 @@
 __author__ = 'matias'
 
-from gensim import models, corpora, similarities
 
-from PubMedParser.entityextractor import CaseReportLibrary
+from gensim import corpora, models
+import os
 
-texts = []
-count = 1
-max_count = 3000
-print "reading case reports.."
-for case in CaseReportLibrary():
-    texts.append(case.mesh_terms)
-    count += 1
-    if count % 100 == 0:
-        print count,"/",max_count
-    if count >= max_count:
-        break
+data_folder = os.path.join(*[os.path.dirname(__file__), 'data'])
 
-dictionary = corpora.Dictionary(texts)
+dictionary = corpora.Dictionary.load(os.path.join(data_folder, 'standard.dict'))
+corpus = corpora.MmCorpus(os.path.join(data_folder, 'standard.mm'))
 
-for text in texts:
-    print dictionary.doc2bow(text)
+lda = models.LdaModel(corpus,num_topics=100,id2word=dictionary)
+
+print lda.print_topic(10)
