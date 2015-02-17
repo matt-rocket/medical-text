@@ -10,7 +10,6 @@ cases = CaseReportLibrary()
 d_extractor = DiseaseExtractor()
 s_extractor = SymptomExtractor()
 
-
 count = 0
 max_count = 1
 for (title,body,filename,keywords,abstract) in cases:

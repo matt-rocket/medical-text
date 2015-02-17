@@ -1,5 +1,6 @@
 __author__ = 'matias'
 
+import os
 import xml.etree.ElementTree as ET
 from pubmed_tokenize import tokenize
 from irdatastructs import TokenTrie
@@ -9,7 +10,8 @@ class DiseaseExtractor(object):
     def __init__(self):
         self.trie = TokenTrie(name="disease")
         if self.trie.is_empty():
-            disease_names = open('../../data/UMLS/diseases.txt').read().split('\n')
+            diseases_file = open(os.path.join(*[os.path.dirname(__file__), 'data', 'UMLS', 'diseases.txt']))
+            disease_names = diseases_file.read().split('\n')
             count = 0
             for disease in disease_names:
                 self.trie.add(tokenize(disease))
@@ -25,7 +27,8 @@ class SymptomExtractor(object):
     def __init__(self):
         self.trie = TokenTrie(name="symptoms")
         if self.trie.is_empty():
-            symptoms = open('../../data/UMLS/symptoms.txt').read().split('\n')
+            symptoms_file = open(os.path.join(*[os.path.dirname(__file__), 'data', 'UMLS', 'diseases.txt']))
+            symptoms = symptoms_file.read().split('\n')
             count = 0
             for symptom in symptoms:
                 (code, name) = symptom.split("\t")
@@ -43,7 +46,8 @@ class CaseReportLibrary(object):
         sections = ['A-B', 'C-H', 'I-N', 'O-Z']
         self.filenames = []
         for section in sections:
-            with open("case_report_list_%s.txt" % section) as infile:
+            section_filepath = os.path.join(*[os.path.dirname(__file__), "data", "case_report_list_%s.txt"]) % section
+            with open(section_filepath) as infile:
                 self.filenames += infile.read().split("\n")
         if filename:
             self.filenames = [filename]

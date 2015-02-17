@@ -11,6 +11,7 @@ case_reports = CaseReportLibrary()
 
 count = 0
 hits = 0
+
 for case_report in case_reports:
     count += 1
     print "added",count
@@ -21,4 +22,5 @@ for case_report in case_reports:
                  keywords=",".join(case_report.mesh_terms).decode('utf-8'),
                  resourcename=case_report.filename,
                  )
+
 solr_con.commit()

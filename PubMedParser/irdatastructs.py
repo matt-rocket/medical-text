@@ -7,9 +7,10 @@ import pickle
 class TokenTrie(object):
     def __init__(self,name):
         self.path = {}
-        self.cache_filename = name+".trie.cache"
+        filename = name+".trie.cache"
+        self.cache_filename = os.path.join(*[os.path.dirname(__file__), "data", filename])
         # try to load from cache
-        if os.path.isfile(name+".trie.cache"):
+        if os.path.isfile(self.cache_filename):
             try:
                 print "loading trie cache.."
                 self.path = pickle.load(open(self.cache_filename))
@@ -59,7 +60,8 @@ class TokenTrie(object):
 class InvertedIndex(object):
     def __init__(self, name):
         self.index = {}
-        self.cache_filename = name + ".index.cache"
+        filename = name+".index.cache"
+        self.cache_filename = os.path.join(*[os.path.dirname(__file__), "data", filename])
 
     def add(self, terms, doc):
         for term in terms:
