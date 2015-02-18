@@ -7,12 +7,12 @@ from PubMedParser.pubmed_tokenize import tokenize, stopwords
 
 data_folder = os.path.join(*[os.path.dirname(__file__), 'data'])
 
-pubmed_stopwords = stopwords("pubmed")
+pubmed_stopwords = stopwords("pubmed_v2")
 
 def create_corpus():
     docs = []
     count = 1
-    max_count = 30
+    max_count = 500
     for case in CaseReportLibrary():
         # lower case all text (1)
         text = case.get_text().lower()

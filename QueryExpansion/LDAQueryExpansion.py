@@ -11,4 +11,5 @@ corpus = corpora.MmCorpus(os.path.join(data_folder, 'standard.mm'))
 
 lda = models.LdaModel(corpus,num_topics=100,id2word=dictionary)
 
-print lda.print_topic(10)
+for i in range(20):
+    print lda.print_topic(i, topn=5)
