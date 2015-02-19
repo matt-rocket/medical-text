@@ -12,7 +12,7 @@ pubmed_stopwords = stopwords("pubmed_v2")
 def create_corpus():
     docs = []
     count = 1
-    max_count = 500
+    max_count = 1500
     for case in CaseReportLibrary():
         # lower case all text (1)
         text = case.get_text().lower()
@@ -31,8 +31,8 @@ def create_corpus():
     dictionary = corpora.Dictionary(docs)
     corpus = [dictionary.doc2bow(doc) for doc in docs]
 
-    dictionary.save(os.path.join(data_folder, 'standard.dict'))
-    corpora.MmCorpus.serialize(os.path.join(data_folder, 'standard.mm'), corpus)
+    dictionary.save(os.path.join(data_folder, 'sample.dict'))
+    corpora.MmCorpus.serialize(os.path.join(data_folder, 'sample.mm'), corpus)
 
 
 if __name__ == "__main__":

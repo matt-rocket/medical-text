@@ -6,10 +6,11 @@ import os
 
 data_folder = os.path.join(*[os.path.dirname(__file__), 'data'])
 
-dictionary = corpora.Dictionary.load(os.path.join(data_folder, 'standard.dict'))
-corpus = corpora.MmCorpus(os.path.join(data_folder, 'standard.mm'))
+dictionary = corpora.Dictionary.load(os.path.join(data_folder, 'sample.dict'))
 
-lda = models.LdaModel(corpus,num_topics=100,id2word=dictionary)
+corpus = corpora.MmCorpus(os.path.join(data_folder, 'sample.mm'))
 
-for i in range(20):
+lda = models.LdaModel(corpus,num_topics=10,id2word=dictionary)
+
+for i in range(10):
     print lda.print_topic(i, topn=5)

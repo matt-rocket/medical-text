@@ -6,7 +6,7 @@ import os
 def tokenize(text):
     if text is None:
         return []
-    text = text.replace("\n", " ")
+    text = text.replace("\n", " ").replace("."," ").replace(u"”", u"'").replace(u"’", u"'")
     return word_tokenize(text)
 
 def stopwords(listname):
