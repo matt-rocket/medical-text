@@ -7,9 +7,9 @@ from PubMedParser.pubmed_tokenize import tokenize, stopwords
 
 data_folder = os.path.join(*[os.path.dirname(__file__), 'data'])
 
-pubmed_stopwords = stopwords("pubmed_v3")
+stopwords = stopwords("pubmed_v3")
 
-def create_corpus():
+def create_entity_corpus():
     docs = []
     count = 1
     max_count = 50000
@@ -31,9 +31,9 @@ def create_corpus():
     dictionary = corpora.Dictionary(docs)
     corpus = [dictionary.doc2bow(doc) for doc in docs]
 
-    dictionary.save(os.path.join(data_folder, 'standard.dict'))
-    corpora.MmCorpus.serialize(os.path.join(data_folder, 'standard.mm'), corpus)
+    dictionary.save(os.path.join(data_folder, 'entity.dict'))
+    corpora.MmCorpus.serialize(os.path.join(data_folder, 'entity.mm'), corpus)
 
 
 if __name__ == "__main__":
-    create_corpus()
+    create_entity_corpus()
