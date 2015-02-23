@@ -3,7 +3,7 @@ __author__ = 'matias'
 from irdatastructs import InvertedIndex
 from matplotlib import pyplot as plt
 
-entity_type = "symptom"
+entity_type = "disease"
 
 index = InvertedIndex(entity_type)
 index.load()
@@ -15,7 +15,7 @@ for term in index.index:
 ranking.sort(key=lambda tup:tup[1])
 
 count = 1
-with open('symptom_stopwords.txt','w') as outfile:
+with open("%s_stopwords.txt" % (entity_type,), 'w') as outfile:
     for e in ranking:
         print count, e
         if e[1] > 80:

@@ -1,396 +1,49 @@
-site infection
-hypercellular marrow
-NM
-AGA
-sleep disturbance
-OCD
-sexual dysfunction
-Hyperthyroidism
-hypereosinophilic syndrome
-pleurisy
-Bacteremia
-recurrent fever
-secondary glaucoma
-pansystolic murmur
-autoimmune thyroid disease
-deep vein thrombosis ( DVT )
-normocytic normochromic anemia
-Glaucoma
-prostatitis
-CHF
-neuroleptic malignant
-urinary tract obstruction
-nodular fasciitis
-DI
-dry eye
-central retinal artery occlusion
-acute heart failure
-Cirrhosis
-infestations
-hyperthyroid
-salivation
-demyelinating polyneuropathy
-genodermatosis
-Retinopathy
-HELLP
-Myocarditis
-VHL
-angiopathy
-Anaphylaxis
-Asthma
-SCA
-chest infection
-AKI
-Encephalitis
-IgA nephropathy
-Aspergillosis
-chronic infections
-malignant syndrome
-bend
-arterial dissection
-primary infertility
-IP
-Influenza
-cerebral lesions
-Cold
-SDS
-circulatory arrest
-intestinal ischemia
-extrapulmonary tuberculosis
-TIA
-endocrinopathy
-bleeding disorder
-renal diseases
-invasive aspergillosis
-VF
-BMD
-posterior vitreous detachment
-Malaria
-type II diabetes mellitus
-genetic syndromes
-GERD
-tension pneumothorax
-TCC
-Purpura
-Systemic Lupus Erythematosus
-Hydrocephalus
-Syphilis
-Acute renal failure
-limb ischemia
-hematological disorders
-bilateral hydronephrosis
-coagulopathies
-HP
-CKD
-osteophytes
-multiple sclerosis ( MS )
-Appendicitis
-IC
-AMI
-organizing pneumonia
-PDS
-mesenteric ischemia
-depigmentation
-thromboembolic disease
-Hypercalcemia
-tapeworm
-diabetes mellitus ( DM )
-hypertensive crisis
-AAA
-sarcoid
-SCD
-cystic disease
-chronic renal insufficiency
-venous hypertension
-bleeding disorders
-aqueous humor
-Colitis
-congestive cardiac failure
-inflammatory disease of
-adrenal masses
-ventricular failure
-DES
-respiratory disease
-ITP
-human immunodeficiency virus infection
-Parkinsonism
-hemophagocytosis
-mycobacterial infection
-bowel diseases
-Amyloidosis
-HT
-venous obstruction
-cardiac events
-hormone deficiency
-Hypertrophic
-Endometriosis
-Relapse
-choking
-cervical mass
-seminal vesicles
-zoonosis
-hepatic mass
-GVHD
-Infectious Diseases
-CAM
-TMJ
-ECT
-LS
+Ovary
+Spinal Cord
+Esophagus
+Trachea
+struck
 Endo
-MK
-Hypothyroidism
-asthmatic
-acquired immunodeficiency syndrome ( AIDS )
-RS
-CF
-autoimmune thyroiditis
-TTP
-tuberculosis infection
-chronic inflammatory disease
-Eosinophilia
-RP
-odontogenic keratocyst
-early pregnancy
-Myocardial Infarction
-genetic disease
-skin infection
-ventricular dilatation
-arachnoid cyst
-bleeding diathesis
-GBS
-metabolic disorder
-Epilepsy
-CGH
-HIV/AIDS
-Pneumothorax
-mononucleosis
-pulmonary stenosis
-Neuropathy
-aneurysmal dilatation
-MH
-adrenal hyperplasia
-vaginalis
-AT
-facial nerve palsy
-Pneumoperitoneum
-Aneurysms
-brain lesion
-bowel ischemia
-Intussusception
-Dysphagia
-GS
-local disease
-TN
-systemic sclerosis
-Ischemia
-Endocarditis
-MG
-VP
-inguinal lymphadenopathy
-connective tissue disorder
-PBS
-UTI
-anterior uveitis
-Osteomyelitis
-synechiae
-pleural thickening
-BE
-myelosuppression
-PAP
-IBD
-Obesity
-MDS
-glomerulosclerosis
-PCA
-chromosomal abnormality
-urticarial
-systemic illness
-von Willebrand
-Borrelia
-MIP
-sentinel lymph node
-neurological disease
-CAD
-AL
-CP
-bleeding tendency
-HCG
-obstructive hydrocephalus
-genetic disorders
-HS
-TS
-disseminated intravascular coagulation ( DIC )
-polyarteritis
-AR
-ACC
-Pancreatitis
-tuberculosis ( TB )
-Hepatitis C
-endothelial dysfunction
-MRSA
-Sarcoidosis
-artery dissection
-inflammatory disorder
-epiphysis
-AVM
-Pneumonia
-Klebsiella pneumoniae
-Pneumocystis
-Epstein
-Vasculitis
-tubular necrosis
-vascular occlusion
-Mycoplasma
-Pituitary
-parvovirus
-Helicobacter pylori
-Pancreas
-raised intracranial pressure
-Arthritis
-NS
-gallstone
-varicella zoster
-AD
-AH
-acute infection
-bilateral pleural effusion
-Cardiomyopathy
-vein occlusion
-neuromuscular blockade
-acute cholecystitis
-respiratory insufficiency
-ischemic attack
-febrile illness
-Crohn 's disease ,
-ARDS
-volume overload
-Cysts
-PC
-primary infection
-bending
-systemic infection
-Hepatitis B
-epididymis
-ESRD
-autoimmune disorder
-mycosis
-connective tissue disorders
-HIV infection
-difficulty in swallowing
-diabetes insipidus
-retroperitoneal mass
-FA
-COPD
-lymphatic vessels
-microangiopathy
-HSV
-gammopathy
-adrenal mass
-hypercoagulable state
-brain lesions
-muscle relaxation
-chronic infection
-mediastinal lymphadenopathy
-DVT
-localized disease
-high blood pressure
-immune deficiency
-obstructive jaundice
-Anemia
-immunodeficiency syndrome
-ICD
-DIC
-granulomatous disease
-AS
-respiratory infection
-HBV
-keratosis
-nerve palsies
-secondary infection
-pulmonary involvement
-AA
-systemic lupus erythematosus ( SLE )
-HD
-adrenal insufficiency
-infective endocarditis
-DM
-severe anemia
-chronic liver disease
-LCA
-SS
-Infections
-desmoplastic
-Abscess
-neuropathies
-ischaemia
-PD
-fallopian tube
-infestation
-lymphocytic infiltration
-BD
-Stroke
-MI
-Crohn 's disease
-artery stenosis
-MD
-MS
-genetic disorder
-acute respiratory distress
-Hypertension
-sore throat
-granulomatosis
-bone lesions
-autoimmune disorders
-deep vein thrombosis
-malignant disease
-LAD
-Diabetes
-cord compression
-Aneurysm
-recurrent disease
-epileptic
-Infectious
-nevus
-TB
+external ear
+inner ear
+arrested
+uterine cervix
+Stomach
+external genitalia
+middle ear
+Colon
+Disorders
+periosteum
+Diseases
 sclera
-SLE
-HIV infection
-loss of appetite
-SD
-Tuberculosis
-Coma
-virus infection
-short stature
-ventricular hypertrophy
-OD
-hemodynamic instability
-inflammatory disease
-CMV
-ED
-OS
-tuberculous
-RA
-AIDS
-arterial hypertension
-Hepatitis
-Thoracic
-bowel disease
-septal defect
-SMA
-MA
-conjunctiva
-autoimmune disease
-intraocular pressure
-EMA
-CD
-renal disease
+urethra
+penis
+ganglion
+scrotum
+cornea
+Posterior
+vagina
+crest
+ureter
+lens
+optic nerve
+Thyroid
 said
-cystic mass
-meningitis
-plaque
-lupus
-immunodeficiency
+Lung
+retina
+Anterior
+prostate
+rare disease
+arrest
+Brain
+Liver
+cortex
+uterus
+Disease
 MR
-sepsis
-HIV
-cavity
+Syndrome
+giant
+disorder
+infection
+condition
+1

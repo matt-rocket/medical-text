@@ -2,25 +2,25 @@ __author__ = 'matias'
 
 from gensim import corpora
 import os
-from PubMedParser.entityextractor import CaseReportLibrary
-from PubMedParser.pubmed_tokenize import tokenize, stopwords
+from PubMedParser.entityextractor import CaseReportLibrary, DiseaseExtractor, SymptomExtractor
+from PubMedParser.pubmed_tokenize import stopwords
 
 data_folder = os.path.join(*[os.path.dirname(__file__), 'data'])
 
-stopwords = stopwords("pubmed_v3")
+entity_stopwords = stopwords("disease").union(stopwords("symptom"))
+
+d_extractor = DiseaseExtractor()
+s_extractor = SymptomExtractor()
 
 def create_entity_corpus():
     docs = []
     count = 1
     max_count = 50000
     for case in CaseReportLibrary():
-        # lower case all text (1)
-        text = case.get_text().lower()
-        tokens = tokenize(text)
+        # get symptom and disease entities
+        tokens = case.get_entities(d_extractor) + case.get_entities(s_extractor)
         # remove stopwords (2)
-        tokens = [token for token in tokens if token not in pubmed_stopwords]
-        # TODO: stem tokens (3)
-
+        tokens = [token for token in tokens if token not in entity_stopwords]
         docs.append(tokens)
         count += 1
         if count % 100 == 0:
