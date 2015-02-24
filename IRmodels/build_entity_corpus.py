@@ -17,8 +17,10 @@ def create_entity_corpus():
     count = 1
     max_count = 50000
     for case in CaseReportLibrary():
+        text = case.get_text()
         # get symptom and disease entities
-        tokens = case.get_entities(d_extractor) + case.get_entities(s_extractor)
+        # Bernoulli model/ Binary independence model
+        tokens = list(set(d_extractor.extract(text) + s_extractor.extract(text)))
         # remove stopwords (2)
         tokens = [token for token in tokens if token not in entity_stopwords]
         docs.append(tokens)

@@ -3,10 +3,10 @@ __author__ = 'matias'
 from gensim import corpora, models
 
 print "loading dictionary.."
-dictionary = corpora.Dictionary.load('QueryExpansion/data/sample.dict')
+dictionary = corpora.Dictionary.load('IRmodels/data/sample.dict')
 
 print "loading corpus.."
-corpus = corpora.MmCorpus('QueryExpansion/data/sample.mm')
+corpus = corpora.MmCorpus('IRmodels/data/sample.mm')
 
 print "building TF-IDF model.."
 tfidf = models.TfidfModel(corpus, id2word=dictionary)

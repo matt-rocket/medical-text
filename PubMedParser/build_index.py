@@ -15,8 +15,8 @@ max_count = 50000
 for case in cases:
     text = case.get_text()
     count += 1
-    symptoms = [" ".join(words) for words in s_extractor.extract(text)]
-    diseases = [" ".join(words) for words in d_extractor.extract(text)]
+    symptoms = list(set(s_extractor.extract(text)))
+    diseases = list(set(d_extractor.extract(text)))
     s_index.add(symptoms,count)
     d_index.add(diseases,count)
     if count >= max_count:

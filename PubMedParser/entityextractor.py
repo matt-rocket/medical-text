@@ -20,7 +20,9 @@ class DiseaseExtractor(object):
             self.trie.save_to_cache()
 
     def extract(self, text):
-        return self.trie.scan(tokenize(text))
+        sequences = self.trie.scan(tokenize(text))
+        # assemble sequences into tokens
+        return [" ".join(seq) for seq in sequences]
 
 
 class SymptomExtractor(object):
@@ -38,7 +40,9 @@ class SymptomExtractor(object):
             self.trie.save_to_cache()
 
     def extract(self, text):
-        return self.trie.scan(tokenize(text))
+        sequences = self.trie.scan(tokenize(text))
+        # assemble sequences into tokens
+        return [" ".join(seq) for seq in sequences]
 
 
 class CaseReportLibrary(object):
@@ -51,6 +55,13 @@ class CaseReportLibrary(object):
                 self.filenames += infile.read().split("\n")
         if filename:
             self.filenames = [filename]
+
+    def __getitem__(self, item):
+        tree = ET.parse(self.filenames[item])
+        root = tree.getroot()
+        title = root.find('./front/article-meta/title-group/article-title')
+        title = ET.tostring(title, encoding='utf8', method='text')
+        return title
 
     def __iter__(self):
         for filename in self.filenames:
