@@ -1,6 +1,6 @@
 __author__ = 'matias'
 
-from PubMedParser.entityextractor import CaseReportLibrary, DiseaseExtractor
+from textanalysis.entityextractor import CaseReportLibrary, DiseaseExtractor
 import solr
 
 solr_con = solr.SolrConnection('http://localhost:8983/solr')

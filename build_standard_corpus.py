@@ -2,25 +2,22 @@ __author__ = 'matias'
 
 from gensim import corpora
 import os
-from PubMedParser.entityextractor import CaseReportLibrary
-from PubMedParser.pubmed_tokenize import tokenize, stopwords
+from textanalysis.entityextractor import CaseReportLibrary
+from textanalysis.Analyzers import StandardAnalyzer
 
-data_folder = os.path.join(*[os.path.dirname(__file__), 'data', 'corpora'])
-
-pubmed_stopwords = stopwords("pubmed_v3")
 
 def create_corpus():
+    data_folder = os.path.join(*[os.path.dirname(__file__), 'data', 'corpora'])
+
+    analyzer = StandardAnalyzer()
+
     docs = []
     count = 1
     max_count = 50000
     for case in CaseReportLibrary():
         # lower case all text (1)
-        text = case.get_text().lower()
-        tokens = tokenize(text)
-        # remove stopwords (2)
-        tokens = [token for token in tokens if token not in pubmed_stopwords]
-        # TODO: stem tokens (3)
-
+        text = case.get_text()
+        tokens = analyzer.parse(text)
         docs.append(tokens)
         count += 1
         if count % 100 == 0:

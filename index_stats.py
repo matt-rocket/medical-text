@@ -1,6 +1,6 @@
 __author__ = 'matias'
 
-from PubMedParser.irdatastructs import InvertedIndex
+from textanalysis.irdatastructs import InvertedIndex
 from matplotlib import pyplot as plt
 
 entity_type = "disease"

@@ -2,7 +2,6 @@ __author__ = 'matias'
 
 from gensim import corpora, models
 from gensim.matutils import sparse2full
-from PubMedParser.entityextractor import DiseaseExtractor, SymptomExtractor
 from scoring import kl_divergence
 import os
 import logging
@@ -34,7 +33,14 @@ class LDAmodel(object):
 
         # transform corpus to latent variable vectors
         print "transforming documents to latent space.."
-        self.latent_docs = [self.model[doc] for doc in self.corpus]
+        self.latent_docs = []
+        count = 1
+        for doc in self.corpus:
+            self.latent_docs.append(self.model[doc])
+            count += 1
+            if count % 1000 == 0:
+                print count, "converted.."
+        #[self.model[doc] for doc in self.corpus]
 
     def train(self, n_topics, n_passes, update_every=0):
         """
@@ -51,44 +57,32 @@ class LDAmodel(object):
                                     id2word=self.dictionary)
         return lda_model
 
-    def query(self, query, top_n=10):
+    def query(self, query_tokens, top_n=10):
         """
         Get the top N ranked document ids.
-        :param query: The query string
+        :param query_tokens: List of query token strings
         :param top_n: the number of top ranked docids returned
         :return: top ranked document ids
         """
-        d_extractor = DiseaseExtractor()
-        s_extractor = SymptomExtractor()
-        doc = list(set(d_extractor.extract(query) + s_extractor.extract(query)))
-        # convert query to Bag-Of-Word (BOW) vector
-        bow = self.dictionary.doc2bow(doc)
+        # convert query tokens to Bag-Of-Word (BOW) vector
+        bow = self.dictionary.doc2bow(query_tokens)
         # transform BOW vector to latent variable space
         latent_vector = self.model[bow]
+        # rank document by Kullback-Leibler divergence
         ranking = []
-        p = sparse2full(latent_vector,10)
+        p = sparse2full(latent_vector, 10)
+
         for i in range(len(self.latent_docs)):
-            q = sparse2full(self.latent_docs[i],10)
+            q = sparse2full(self.latent_docs[i], 10)
             ranking.append((i, kl_divergence(p, q)))
 
         ranking.sort(key=lambda x: x[1])
 
-        return ranking[:500]
+        return ranking[:top_n]
 
 if __name__ == "__main__":
     # setup logging
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
     # model parameters
-    model = LDAmodel(n_topics=10, n_passes=100, vocabulary="entity")
-
-    """
-    for i in range(10):
-        print model.model.print_topic(i, topn=100)
-    """
-    from PubMedParser.entityextractor import CaseReportLibrary
-    cases = CaseReportLibrary()
-
-    ranked_docs = model.query("HIV hiv AIDS aids human immunodeficiency virus acquired immune deficiency syndrome Human immunodeficiency virus infection human immunodeficiency virus infection")
-    for doc in ranked_docs:
-        print doc[1], cases[doc[0]]
+    model = LDAmodel(n_topics=10, n_passes=100, vocabulary="standard")

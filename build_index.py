@@ -1,7 +1,7 @@
 __author__ = 'matias'
 
-from entityextractor import CaseReportLibrary, DiseaseExtractor, SymptomExtractor
-from irdatastructs import InvertedIndex
+from textanalysis.entityextractor import CaseReportLibrary, DiseaseExtractor, SymptomExtractor
+from textanalysis.irdatastructs import InvertedIndex
 
 d_index = InvertedIndex("disease")
 s_index = InvertedIndex("symptom")
