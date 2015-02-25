@@ -12,6 +12,7 @@ class LDAmodel(object):
         # load data
         models_folder = os.path.join(*[os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'models'])
         corpora_folder = os.path.join(*[os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'corpora'])
+        self.n_topics = n_topics
         self.vocabulary = vocabulary
         self.filename = "LDAmodel_%s_%s_%s" % (vocabulary, n_topics, n_passes,)
         self.dictionary = corpora.Dictionary.load(os.path.join(corpora_folder, "%s.dict" % (vocabulary,)))
@@ -70,10 +71,10 @@ class LDAmodel(object):
         latent_vector = self.model[bow]
         # rank document by Kullback-Leibler divergence
         ranking = []
-        p = sparse2full(latent_vector, 10)
-
+        p = sparse2full(latent_vector, self.n_topics)
+        print p
         for i in range(len(self.latent_docs)):
-            q = sparse2full(self.latent_docs[i], 10)
+            q = sparse2full(self.latent_docs[i], self.n_topics)
             ranking.append((i, kl_divergence(p, q)))
 
         ranking.sort(key=lambda x: x[1])
@@ -85,4 +86,4 @@ if __name__ == "__main__":
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
     # model parameters
-    model = LDAmodel(n_topics=10, n_passes=100, vocabulary="standard")
+    model = LDAmodel(n_topics=200, n_passes=100, vocabulary="entity")
