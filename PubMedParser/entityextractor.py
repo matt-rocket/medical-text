@@ -50,7 +50,7 @@ class CaseReportLibrary(object):
         sections = ['A-B', 'C-H', 'I-N', 'O-Z']
         self.filenames = []
         for section in sections:
-            section_filepath = os.path.join(*[os.path.dirname(__file__), "data", "case_report_list_%s.txt"]) % section
+            section_filepath = os.path.join(*[os.path.dirname(__file__), "data", "casereportlists",  "case_report_list_%s.txt"]) % section
             with open(section_filepath) as infile:
                 self.filenames += infile.read().split("\n")
         if filename:

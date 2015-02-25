@@ -8,7 +8,7 @@ class TokenTrie(object):
     def __init__(self,name):
         self.path = {}
         filename = name+".trie.cache"
-        self.cache_filename = os.path.join(*[os.path.dirname(__file__), "data", filename])
+        self.cache_filename = os.path.join(*[os.path.dirname(__file__), "data", "structs", filename])
         # try to load from cache
         if os.path.isfile(self.cache_filename):
             try:
@@ -61,7 +61,7 @@ class InvertedIndex(object):
     def __init__(self, name):
         self.index = {}
         filename = name+".index.cache"
-        self.cache_filename = os.path.join(*[os.path.dirname(__file__), "data", filename])
+        self.cache_filename = os.path.join(*[os.path.dirname(__file__), "data", "structs", filename])
 
     def add(self, terms, doc):
         for term in terms:

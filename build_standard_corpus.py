@@ -5,7 +5,7 @@ import os
 from PubMedParser.entityextractor import CaseReportLibrary
 from PubMedParser.pubmed_tokenize import tokenize, stopwords
 
-data_folder = os.path.join(*[os.path.dirname(__file__), 'data'])
+data_folder = os.path.join(*[os.path.dirname(__file__), 'data', 'corpora'])
 
 pubmed_stopwords = stopwords("pubmed_v3")
 

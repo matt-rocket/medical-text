@@ -11,25 +11,26 @@ import logging
 class LDAmodel(object):
     def __init__(self, n_topics, n_passes, vocabulary):
         # load data
-        data_folder = os.path.join(*[os.path.dirname(__file__), 'data'])
+        models_folder = os.path.join(*[os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'models'])
+        corpora_folder = os.path.join(*[os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'corpora'])
         self.vocabulary = vocabulary
         self.filename = "LDAmodel_%s_%s_%s" % (vocabulary, n_topics, n_passes,)
-        self.dictionary = corpora.Dictionary.load(os.path.join(data_folder, "%s.dict" % (vocabulary,)))
-        self.corpus = corpora.MmCorpus(os.path.join(data_folder, "%s.mm" % (vocabulary,)))
+        self.dictionary = corpora.Dictionary.load(os.path.join(corpora_folder, "%s.dict" % (vocabulary,)))
+        self.corpus = corpora.MmCorpus(os.path.join(corpora_folder, "%s.mm" % (vocabulary,)))
 
         # does identical model already exists?
-        model_exists = os.path.isfile(os.path.join(data_folder, self.filename))
+        model_exists = os.path.isfile(os.path.join(models_folder, self.filename))
         if model_exists:
             # if model already exists then load it
             print "loading model.."
-            self.model = models.LdaModel.load(os.path.join(data_folder, self.filename))
+            self.model = models.LdaModel.load(os.path.join(models_folder, self.filename))
         else:
             # train model with given parameters
             print "training model.."
-            self.model = self.train(topics, passes)
+            self.model = self.train(n_topics, n_passes)
             # save model state to file
             print "saving model.."
-            self.model.save(os.path.join(data_folder, self.filename))
+            self.model.save(os.path.join(models_folder, self.filename))
 
         # transform corpus to latent variable vectors
         print "transforming documents to latent space.."
@@ -72,7 +73,7 @@ class LDAmodel(object):
 
         ranking.sort(key=lambda x: x[1])
 
-        return ranking[:150]
+        return ranking[:500]
 
 if __name__ == "__main__":
     # setup logging

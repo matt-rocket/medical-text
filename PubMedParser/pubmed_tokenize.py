@@ -10,7 +10,7 @@ def tokenize(text):
     return word_tokenize(text)
 
 def stopwords(listname):
-    filepath = os.path.join(*[os.path.dirname(__file__), 'data', listname+"_stopwords.txt"])
+    filepath = os.path.join(*[os.path.dirname(__file__), 'data', 'stopwordlists', listname+"_stopwords.txt"])
     stopword_list = open(filepath,'r').read().split("\n")
     return set(stopword_list)
 
