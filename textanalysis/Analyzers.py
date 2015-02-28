@@ -19,7 +19,7 @@ class EntityAnalyzer(object):
 class StandardAnalyzer(object):
 
     def __init__(self):
-        self.stopwords = stopwords("")
+        self.stopwords = stopwords("pubmed_v3")
 
     def parse(self, text):
         # lowercase query
