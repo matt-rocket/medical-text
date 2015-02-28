@@ -8,11 +8,14 @@ from irmodels.LDAmodel import LDAmodel
 
 cases = CaseReportLibrary()
 
-model = LDAmodel(n_topics=20, n_passes=100, vocabulary="entity")
+model = LDAmodel(n_topics=500, n_passes=200, vocabulary="entity")
 
 analyzer = EntityAnalyzer()
 
+for i in range(100):
+    print model.model.print_topic(i)
 
+"""
 query_str = raw_input("search: ")
 while query_str:
     query_tokens = analyzer.parse(query_str)
@@ -22,7 +25,8 @@ while query_str:
     print ""
     print "Results:"
     for doc in ranked_docs:
-        print cases[doc[0]]
+        print doc[0], doc[1], cases[doc[0]]
 
     print "-----"
     query_str = raw_input("search: ")
+"""

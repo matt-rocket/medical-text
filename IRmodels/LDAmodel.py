@@ -75,7 +75,8 @@ class LDAmodel(object):
         print p
         for i in range(len(self.latent_docs)):
             q = sparse2full(self.latent_docs[i], self.n_topics)
-            ranking.append((i, kl_divergence(p, q)))
+            score = kl_divergence(p, q)
+            ranking.append((i, score))
 
         ranking.sort(key=lambda x: x[1])
 
@@ -86,4 +87,4 @@ if __name__ == "__main__":
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
     # model parameters
-    model = LDAmodel(n_topics=200, n_passes=100, vocabulary="entity")
+    model = LDAmodel(n_topics=500, n_passes=200, vocabulary="entity")
