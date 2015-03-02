@@ -7,17 +7,13 @@ import os
 import logging
 
 
-class LDAmodel(object):
-    """
-    IR models based on Latent Dirichlet Allocation
-    """
-    def __init__(self, n_topics, n_passes, vocabulary):
+class HDPmodel(object):
+    def __init__(self, vocabulary):
         # load data
         models_folder = os.path.join(*[os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'models'])
         corpora_folder = os.path.join(*[os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'corpora'])
-        self.n_topics = n_topics
         self.vocabulary = vocabulary
-        self.filename = "LDAmodel_%s_%s_%s" % (vocabulary, n_topics, n_passes,)
+        self.filename = "HDPmodel_%s" % (vocabulary, )
         self.dictionary = corpora.Dictionary.load(os.path.join(corpora_folder, "%s.dict" % (vocabulary,)))
         self.corpus = corpora.MmCorpus(os.path.join(corpora_folder, "%s.mm" % (vocabulary,)))
 
@@ -30,7 +26,7 @@ class LDAmodel(object):
         else:
             # train model with given parameters
             print "training model.."
-            self.model = self.train(n_topics, n_passes)
+            self.model = self.train()
             # save model state to file
             print "saving model.."
             self.model.save(os.path.join(models_folder, self.filename))
@@ -44,22 +40,18 @@ class LDAmodel(object):
             count += 1
             if count % 1000 == 0:
                 print count, "converted.."
-        #[self.model[doc] for doc in self.corpus]
 
-    def train(self, n_topics, n_passes, update_every=0):
+
+    def train(self):
         """
-        Train the LDA model
-        :param n_topics: number of LDA topics
+        Train the HDP model
         :param n_passes: number of training passes
         :param update_every: training batch size
         :return: trained model
         """
-        lda_model = models.LdaModel(self.corpus,
-                                    num_topics=n_topics,
-                                    update_every=update_every,
-                                    passes=n_passes,
+        hdp_model = models.HdpModel(self.corpus,
                                     id2word=self.dictionary)
-        return lda_model
+        return hdp_model
 
     def query(self, query_tokens, top_n=10):
         """
@@ -90,4 +82,4 @@ if __name__ == "__main__":
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
     # model parameters
-    model = LDAmodel(n_topics=100, n_passes=10, vocabulary="combined")
+    model = HDPmodel(vocabulary="combined")
