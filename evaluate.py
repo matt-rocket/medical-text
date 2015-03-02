@@ -1,7 +1,7 @@
 __author__ = 'matias'
 
 
-from textanalysis.entityextractor import CaseReportLibrary
+from textanalysis.texts import CaseReportLibrary
 from textanalysis.Analyzers import EntityAnalyzer
 from irmodels.LDAmodel import LDAmodel
 

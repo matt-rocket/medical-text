@@ -44,7 +44,6 @@ class LDAmodel(object):
             count += 1
             if count % 1000 == 0:
                 print count, "converted.."
-        #[self.model[doc] for doc in self.corpus]
 
     def train(self, n_topics, n_passes, update_every=0):
         """

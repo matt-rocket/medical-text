@@ -2,7 +2,7 @@ __author__ = 'matias'
 
 from gensim import corpora
 import os
-from textanalysis.entityextractor import CaseReportLibrary
+from textanalysis.texts import CaseReportLibrary
 from textanalysis.Analyzers import CombinedAnalyzer
 
 def create_combined_corpus():
