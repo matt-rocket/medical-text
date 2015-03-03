@@ -34,7 +34,6 @@ class RawSentenceStream(object):
         self.stopwords = stopwords("minimal")
         self.num_converter = Num2TokenConverter()
 
-
     def __iter__(self):
         doc_count = len(self.docs)
         count = 0
@@ -46,8 +45,6 @@ class RawSentenceStream(object):
                 yield tokens
             count += 1
             logging.info(msg="%s/%s documents streamed" % (count, doc_count, ))
-            if count > 10:
-                break
 
 
 class CaseReportLibrary(object):
