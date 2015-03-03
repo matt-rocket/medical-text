@@ -16,3 +16,16 @@ def stopwords(listname):
     stopword_list = open(filepath,'r').read().split("\n")
     return set(stopword_list)
 
+
+class Num2TokenConverter(object):
+    def __init__(self):
+        self.number_words = stopwords("numbers")
+
+    def convert(self,tokens):
+        converted_tokens = []
+        for token in tokens:
+            if token.isdigit() or token in self.number_words:
+                converted_tokens.append("[number]")
+            else:
+                converted_tokens.append(token)
+        return converted_tokens
