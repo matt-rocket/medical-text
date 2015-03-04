@@ -1,20 +1,17 @@
 __author__ = 'matias'
 
-from textanalysis.texts import RawSentenceStream
-from textanalysis.phrasedetection import PmiPhraseDetector
 from gensim.models.word2vec import Word2Vec
 import logging
 import os
 
 
 class W2Vmodel(object):
-    def __init__(self):
+    def __init__(self, sentences):
         self.model = None
 
         # parameters
         self.dataset = "CASEREPORT"
-        self.sentences = RawSentenceStream()
-        self.detector = PmiPhraseDetector()
+        self.sentences = sentences
 
         # data file path
         models_folder = os.path.join(*[os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'models'])
@@ -30,8 +27,4 @@ class W2Vmodel(object):
             self.model.save(self.filepath)
 
 
-if __name__ == "__main__":
-    # setup logging
-    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-    # build model
-    m = W2Vmodel()
+

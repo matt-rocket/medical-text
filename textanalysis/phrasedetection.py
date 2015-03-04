@@ -1,6 +1,5 @@
 __author__ = 'matias'
 
-from textanalysis.texts import SentenceStream
 from gensim.models.phrases import Phrases, prune_vocab
 import os
 import logging
@@ -9,9 +8,9 @@ class PmiPhraseDetector(object):
     """
     Detection using Pointwise Mutual Information (PMI)
     """
-    def __init__(self):
+    def __init__(self, sentences):
         # model parameters
-        self.sentences = SentenceStream()
+        self.sentences = sentences
         self.dataset = "CASEREPORT"
         self.phrases = None
         self.threshold = 80

@@ -5,6 +5,7 @@ import os
 import logging
 from nltk.tokenize import sent_tokenize
 from pubmed_tokenize import tokenize, stopwords, Num2TokenConverter
+from phrasedetection import PmiPhraseDetector
 
 
 class SentenceStream(object):
@@ -45,6 +46,16 @@ class RawSentenceStream(object):
                 yield tokens
             count += 1
             logging.info(msg="%s/%s documents streamed" % (count, doc_count, ))
+
+
+class PhraseSentenceStream(object):
+    def __init__(self):
+        self.stream = RawSentenceStream()
+        self.detector = PmiPhraseDetector(SentenceStream())
+
+    def __iter__(self):
+        for sentence in self.stream:
+            yield self.detector.detect(sentence)
 
 
 class CaseReportLibrary(object):
