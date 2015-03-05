@@ -5,7 +5,6 @@ import os
 import logging
 from nltk.tokenize import sent_tokenize
 from pubmed_tokenize import tokenize, stopwords, Num2TokenConverter
-from phrasedetection import PmiPhraseDetector
 
 
 class SentenceStream(object):
@@ -49,9 +48,9 @@ class RawSentenceStream(object):
 
 
 class PhraseSentenceStream(object):
-    def __init__(self):
+    def __init__(self, phrase_detector):
         self.stream = RawSentenceStream()
-        self.detector = PmiPhraseDetector(SentenceStream())
+        self.detector = phrase_detector
 
     def __iter__(self):
         for sentence in self.stream:
