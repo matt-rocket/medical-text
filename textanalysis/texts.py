@@ -98,6 +98,7 @@ class CaseReportLibrary(object):
     def __len__(self):
         return len(self.filenames)
 
+
 class CaseReport(object):
     def __init__(self, title, body, filename, mesh_terms, abstract):
         self.title = title if title is not None else ""
