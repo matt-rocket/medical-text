@@ -1,32 +1,35 @@
 __author__ = 'matias'
 
-
-from textanalysis.texts import CaseReportLibrary
-from textanalysis.Analyzers import EntityAnalyzer
-from irmodels.LDAmodel import LDAmodel
+import solr
+from evaluation.metrics import *
 
 
-cases = CaseReportLibrary()
+def evaluate(search_engine, k, verbose=False):
+    with open('evaluation/data/findzebra.tsv','r') as infile:
+        records = infile.read().split("\n")
 
-model = LDAmodel(n_topics=500, n_passes=200, vocabulary="entity")
+        query_results = []
 
-analyzer = EntityAnalyzer()
+        for record in records:
+            qid, query, answer, relevant, partly_relevant = record.split("\t")
+            correct_answers = [ans for ans in relevant.split(",") + partly_relevant.split(",") if ans is not '']
+            response = search_engine.query(query, rows=k)
+            returned_docids = [hit[u'id'] for hit in response.results]
+            if verbose:
+                print query
+                print "P@%s" % (k,), precision(correct_answers,returned_docids)
+                print "R@%s" % (k,), recall(correct_answers, returned_docids)
+                print "F@%s" % (k,), f_measure(correct_answers, returned_docids)
+            query_results.append((correct_answers, returned_docids))
 
-for i in range(100):
-    print model.model.print_topic(i)
+        print str(search_engine)
+        print "MAP", mean_average_precision(query_results)
+        print "MRR", mean_reciprocal_rank(query_results)
 
-"""
-query_str = raw_input("search: ")
-while query_str:
-    query_tokens = analyzer.parse(query_str)
-    print query_tokens
-    ranked_docs = model.query(query_tokens)
 
-    print ""
-    print "Results:"
-    for doc in ranked_docs:
-        print doc[0], doc[1], cases[doc[0]]
+if __name__ == "__main__":
 
-    print "-----"
-    query_str = raw_input("search: ")
-"""
+    k = 20
+
+    solr_engine = solr.SolrConnection('http://localhost:8983/solr')
+    evaluate(solr_engine, k)
