@@ -7,7 +7,7 @@ import os
 
 class W2Vmodel(object):
     def __init__(self, sentences):
-        self.model = None
+        self.inner_model = None
 
         # parameters
         self.dataset = "CASEREPORT"
@@ -21,10 +21,11 @@ class W2Vmodel(object):
 
         if model_exists:
             logging.info("found data file %s" % (self.filepath, ))
-            self.model = Word2Vec.load(self.filepath)
+            self.inner_model = Word2Vec.load(self.filepath)
         else:
-            self.model = Word2Vec(sentences=self.sentences)
-            self.model.save(self.filepath)
+            self.inner_model = Word2Vec(sentences=self.sentences)
+            self.inner_model.save(self.filepath)
 
-
+    def __contains__(self, item):
+        return item in self.inner_model
 
