@@ -4,25 +4,20 @@ import xml.etree.ElementTree as ET
 import os
 import logging
 from nltk.tokenize import sent_tokenize
-from pubmed_tokenize import tokenize, stopwords, Num2TokenConverter
+from pubmed_tokenize import SimpleTokenizer, RawTokenizer
 
 
 class SentenceStream(object):
     def __init__(self):
         self.docs = CaseReportLibrary()
-        self.stopwords = stopwords("minimal").union(stopwords("pubmed"))
-        self.num_converter = Num2TokenConverter()
+        self.tokenizer = SimpleTokenizer()
 
     def __iter__(self):
         doc_count = len(self.docs)
         count = 0
         for doc in self.docs:
             for sentence in sent_tokenize(doc.get_text().lower()):
-                tokens = tokenize(sentence)
-                # convert numbers to number-token
-                tokens = self.num_converter.convert(tokens)
-                # remove a few stopwords
-                tokens = [token for token in tokens if token not in self.stopwords]
+                tokens = self.tokenizer.tokenize(sentence)
                 yield tokens
             count += 1
             logging.info(msg="%s/%s documents streamed" % (count, doc_count, ))
@@ -31,17 +26,14 @@ class SentenceStream(object):
 class RawSentenceStream(object):
     def __init__(self):
         self.docs = CaseReportLibrary()
-        self.stopwords = stopwords("minimal")
-        self.num_converter = Num2TokenConverter()
+        self.tokenizer = RawTokenizer()
 
     def __iter__(self):
         doc_count = len(self.docs)
         count = 0
         for doc in self.docs:
             for sentence in sent_tokenize(doc.get_text().lower()):
-                tokens = tokenize(sentence)
-                # convert numbers to number-token
-                tokens = self.num_converter.convert(tokens)
+                tokens = self.tokenizer.tokenize(sentence)
                 yield tokens
             count += 1
             logging.info(msg="%s/%s documents streamed" % (count, doc_count, ))

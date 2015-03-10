@@ -29,3 +29,31 @@ class Num2TokenConverter(object):
             else:
                 converted_tokens.append(token)
         return converted_tokens
+
+
+class SimpleTokenizer(object):
+    def __init__(self):
+        self.stopwords = stopwords("minimal").union(stopwords("pubmed"))
+        self.num_converter = Num2TokenConverter()
+
+    def tokenize(self, string):
+        tokens = tokenize(string)
+        # convert numbers to number-token
+        tokens = self.num_converter.convert(tokens)
+        # remove a few stopwords
+        tokens = [token for token in tokens if token not in self.stopwords]
+        return tokens
+
+
+class RawTokenizer(object):
+    def __init__(self):
+        self.stopwords = stopwords("minimal")
+        self.num_converter = Num2TokenConverter()
+
+    def tokenize(self, string):
+        tokens = tokenize(string)
+        # convert numbers to number-token
+        tokens = self.num_converter.convert(tokens)
+        # remove a few stopwords
+        tokens = [token for token in tokens if token not in self.stopwords]
+        return tokens
