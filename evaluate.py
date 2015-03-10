@@ -1,7 +1,9 @@
 __author__ = 'matias'
 
-import solr
+from search import StandardSolrEngine
+from queryexpansion import AverageW2VExpansion
 from evaluation.metrics import *
+import logging
 
 
 def evaluate(search_engine, k, verbose=False):
@@ -13,7 +15,7 @@ def evaluate(search_engine, k, verbose=False):
         for record in records:
             qid, query, answer, relevant, partly_relevant = record.split("\t")
             correct_answers = [ans for ans in relevant.split(",") + partly_relevant.split(",") if ans is not '']
-            response = search_engine.query(query, rows=k)
+            response = search_engine.query(query, top_n=k)
             returned_docids = [hit[u'id'] for hit in response.results]
             if verbose:
                 print query
@@ -28,8 +30,14 @@ def evaluate(search_engine, k, verbose=False):
 
 
 if __name__ == "__main__":
-
+    # setup logging
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+    # retrieval top k ranked
     k = 20
+    search_engines = [
+        StandardSolrEngine(),
+        StandardSolrEngine(query_expansion=AverageW2VExpansion()),
+        ]
 
-    solr_engine = solr.SolrConnection('http://localhost:8983/solr')
-    evaluate(solr_engine, k)
+    for engine in search_engines:
+        evaluate(engine, k)
