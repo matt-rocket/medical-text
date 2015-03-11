@@ -5,6 +5,7 @@ import os
 import logging
 from nltk.tokenize import sent_tokenize
 from pubmed_tokenize import SimpleTokenizer, RawTokenizer
+from gensim.models.doc2vec import LabeledSentence
 
 
 class SentenceStream(object):
@@ -24,9 +25,10 @@ class SentenceStream(object):
 
 
 class RawSentenceStream(object):
-    def __init__(self):
+    def __init__(self, extract_func=None):
         self.docs = CaseReportLibrary()
         self.tokenizer = RawTokenizer()
+        self.extract_func = extract_func
 
     def __iter__(self):
         doc_count = len(self.docs)
@@ -34,19 +36,29 @@ class RawSentenceStream(object):
         for doc in self.docs:
             for sentence in sent_tokenize(doc.get_text().lower()):
                 tokens = self.tokenizer.tokenize(sentence)
-                yield tokens
+                if self.extract_func is not None:
+                    labeled_tokens = LabeledSentence(words=tokens, labels=self.extract_func(doc))
+                    yield labeled_tokens
+                else:
+                    yield tokens
             count += 1
             logging.info(msg="%s/%s documents streamed" % (count, doc_count, ))
 
 
 class PhraseSentenceStream(object):
-    def __init__(self, phrase_detector):
-        self.stream = RawSentenceStream()
+    def __init__(self, phrase_detector, extract_func=None):
+        self.stream = RawSentenceStream(extract_func=extract_func)
         self.detector = phrase_detector
+        self.is_labeled = extract_func is not None
 
     def __iter__(self):
         for sentence in self.stream:
-            yield self.detector.detect(sentence)
+            # detect phrases in sentence/labeled sentence
+            if self.is_labeled:
+                sentence.words = self.detector.detect(sentence.words)
+            else:
+                sentence = self.detector.detect(sentence)
+            yield sentence
 
 
 class CaseReportLibrary(object):
@@ -128,3 +140,10 @@ class RareDiseases(set):
         for name in names:
             print name.text
 
+
+def extract_docid(doc):
+    return [doc.title]
+
+
+def extract_mesh_terms(doc):
+    return doc.mesh_terms
