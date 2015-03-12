@@ -45,3 +45,12 @@ def mean_reciprocal_rank(query_results):
         else:
             reciprocal_ranks.append(0.0)
     return sum(reciprocal_ranks)/len(query_results)
+
+
+
+def relevant_at_k(correct, results):
+    relevance = map(lambda x: 1 if x in correct else 0, results)
+    if 1 in relevance:
+        return relevance.index(1)+1
+    else:
+        return None

@@ -24,9 +24,10 @@ def evaluate(search_engine, k, verbose=False):
             precisions.append(precision(correct_answers, returned_docids))
             if verbose:
                 print query
-                print "P@%s" % (k,), precision(correct_answers,returned_docids)
+                print "P@%s" % (k,), precision(correct_answers, returned_docids)
                 print "R@%s" % (k,), recall(correct_answers, returned_docids)
                 print "F@%s" % (k,), f_measure(correct_answers, returned_docids)
+                print "Relevant@%s" % (k,), relevant_at_k(correct_answers, returned_docids)
             query_results.append((correct_answers, returned_docids))
 
         print str(search_engine)
