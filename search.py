@@ -31,3 +31,28 @@ class StandardSolrEngine(SearchEngine):
         # remove special Solr query chars
         query_str = query_str.replace(":", "")
         return self.solr_con.query(query_str, rows=top_n)
+
+
+if __name__ == "__main__":
+    engine = StandardSolrEngine()
+    query_input = raw_input("search for:")
+    while query_input is not "":
+        hits = engine.query(query_input, 50).results
+        relevant = []
+        partly_relevant = []
+        print "--------- RESULTS ---------"
+        for hit in hits:
+            relevance_input = ""
+            while not relevance_input.isdigit():
+                relevance_input = raw_input(
+                    str(hit[u'id']) + " " + str(hit[u'title']) +
+                    " (0=not relevant, 1=partly relevant, 2=relevant) Rating:")
+            if relevance_input == "1":
+                partly_relevant.append(hit[u'id'])
+            elif relevance_input == "2":
+                relevant.append(hit[u'id'])
+        print "---------------------------"
+        print "Relevant:  ", ",".join(relevant)
+        print "Partly Relevant:  ", ",".join(partly_relevant)
+        print ""
+        query_input = raw_input("search for:")
