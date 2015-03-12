@@ -1,7 +1,7 @@
 __author__ = 'matias'
 
 from search import StandardSolrEngine
-from queryexpansion import AverageW2VExpansion, TermwiseW2VExpansion
+from queryexpansion import AverageW2VExpansion, TermWindowW2VExpansion, TermwiseW2VExpansion
 from evaluation.metrics import *
 import logging
 
@@ -46,6 +46,7 @@ if __name__ == "__main__":
         StandardSolrEngine(),
         StandardSolrEngine(query_expansion=AverageW2VExpansion()),
         StandardSolrEngine(query_expansion=TermwiseW2VExpansion()),
+        StandardSolrEngine(query_expansion=TermWindowW2VExpansion()),
         ]
 
     for engine in search_engines:
