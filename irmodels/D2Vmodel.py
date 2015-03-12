@@ -6,16 +6,17 @@ import os
 
 
 class D2Vmodel(object):
-    def __init__(self, sentences):
+    def __init__(self, sentences, name):
         self.inner_model = None
 
         # parameters
         self.dataset = "CASEREPORT"
         self.sentences = sentences
+        self.name = name
 
         # data file path
         models_folder = os.path.join(*[os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'models'])
-        filename = "DOC2VEC_%s" % (self.dataset, )
+        filename = "DOC2VEC_%s_%s" % (self.dataset, self.name, )
         self.filepath = os.path.join(models_folder, filename)
         model_exists = os.path.isfile(self.filepath)
 
