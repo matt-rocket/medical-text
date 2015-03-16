@@ -6,7 +6,7 @@ import os
 
 
 class W2Vmodel(object):
-    def __init__(self, sentences):
+    def __init__(self, sentences=[]):
         self.inner_model = None
 
         # parameters
@@ -28,4 +28,3 @@ class W2Vmodel(object):
 
     def __contains__(self, item):
         return item in self.inner_model
-
