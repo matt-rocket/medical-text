@@ -42,4 +42,3 @@ class SymptomExtractor(object):
         sequences = self.trie.scan(tokenize(text))
         # assemble sequences into tokens
         return [" ".join(seq) for seq in sequences]
-
