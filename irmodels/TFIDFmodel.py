@@ -41,4 +41,4 @@ if __name__ == "__main__":
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # build model
     tfidf = TFIDFmodel()
-    print tfidf.dictionary.token2id['and']
+    print tfidf.inner_model.idfs[tfidf.dictionary.token2id['and']]
