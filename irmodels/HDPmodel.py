@@ -3,6 +3,7 @@ __author__ = 'matias'
 from gensim import corpora, models
 from gensim.matutils import sparse2full
 from scoring import kl_divergence
+import pickle
 import os
 import logging
 
@@ -14,6 +15,7 @@ class HDPmodel(object):
         corpora_folder = os.path.join(*[os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'corpora'])
         self.vocabulary = vocabulary
         self.filename = "HDPmodel_%s" % (vocabulary, )
+        self.latent_space_filename = "LATENT_SPACE_HDPmodel_%s" % (vocabulary,)
         self.dictionary = corpora.Dictionary.load(os.path.join(corpora_folder, "%s.dict" % (vocabulary,)))
         self.corpus = corpora.MmCorpus(os.path.join(corpora_folder, "%s.mm" % (vocabulary,)))
 
@@ -22,7 +24,7 @@ class HDPmodel(object):
         if model_exists:
             # if model already exists then load it
             print "loading model.."
-            self.model = models.LdaModel.load(os.path.join(models_folder, self.filename))
+            self.model = models.HdpModel.load(os.path.join(models_folder, self.filename))
         else:
             # train model with given parameters
             print "training model.."
@@ -31,16 +33,30 @@ class HDPmodel(object):
             print "saving model.."
             self.model.save(os.path.join(models_folder, self.filename))
 
-        # transform corpus to latent variable vectors
-        print "transforming documents to latent space.."
-        self.latent_docs = []
-        count = 1
-        for doc in self.corpus:
-            self.latent_docs.append(self.model[doc])
-            count += 1
-            if count % 1000 == 0:
-                print count, "converted.."
+        # does identical model already exists?
+        latent_docs_path = os.path.join(models_folder, self.latent_space_filename)
+        latent_docs_exists = os.path.isfile(latent_docs_path)
 
+        if latent_docs_exists:
+            # load latent vectors from file
+            logging.info("loading latent space vectors..")
+            self.latent_docs = pickle.load(open(latent_docs_path, 'r'))
+        else:
+            # transform corpus to latent variable vectors
+            logging.info("transforming documents to latent space..")
+            self.latent_docs = []
+            count = 1
+            for doc in self.corpus:
+                self.latent_docs.append(self.model[doc])
+                count += 1
+                if count % 1000 == 0:
+                    print count, "converted.."
+            # save to file
+            pickle.dump(self.latent_docs, open(latent_docs_path, 'w'))
+
+
+    def tokens2latent(self, tokens):
+        return self.model[self.dictionary.doc2bow(tokens)]
 
     def train(self):
         """
