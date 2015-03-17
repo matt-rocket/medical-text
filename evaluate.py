@@ -1,7 +1,7 @@
 __author__ = 'matias'
 
 from search import StandardSolrEngine
-from queryexpansion import AverageW2VExpansion, TermWindowW2VExpansion, TermwiseW2VExpansion, WeightedW2VExpansion
+from queryexpansion import *
 from evaluation.metrics import *
 import logging
 
@@ -39,11 +39,12 @@ def evaluate(search_engine, k, verbose=False):
 
 if __name__ == "__main__":
     # setup logging
-    # logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # retrieval top k ranked
-    k = 20
+    k = 50
     search_engines = [
         StandardSolrEngine(),
+        StandardSolrEngine(query_expansion=LDAExpansion()),
         StandardSolrEngine(query_expansion=AverageW2VExpansion()),
         StandardSolrEngine(query_expansion=TermwiseW2VExpansion()),
         StandardSolrEngine(query_expansion=TermWindowW2VExpansion()),

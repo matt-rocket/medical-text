@@ -2,9 +2,10 @@ __author__ = 'matias'
 
 from textanalysis.phrasedetection import PmiPhraseDetector
 from textanalysis.texts import RawSentenceStream, PhraseSentenceStream
-from textanalysis.pubmed_tokenize import RawTokenizer
+from textanalysis.pubmed_tokenize import RawTokenizer, tokenize
 from irmodels.W2Vmodel import W2Vmodel
 from irmodels.TFIDFmodel import TFIDFmodel
+from irmodels.LDAmodel import LDAmodel
 
 
 class QueryExpansion(object):
@@ -93,8 +94,9 @@ class TermWindowW2VExpansion(QueryExpansion):
             similar_phrases = self.model.inner_model.most_similar(window, topn=self.k)
             for i in range(self.k):
                 translated_queries[i-1].append(similar_phrases[i-1][0])
-        query_strings = [" ".join(query) for query in translated_queries]
-        combined_query = ".".join(query_strings)
+        query_strings = [" ".join(q) for q in translated_queries]
+
+        combined_query = query + "." + ".".join(query_strings)
         return combined_query
 
     def __str__(self):
@@ -135,7 +137,30 @@ class WeightedW2VExpansion(QueryExpansion):
     def __str__(self):
         return self.__class__.__name__
 
+
+class LDAExpansion(QueryExpansion):
+
+    def __init__(self):
+        # build model
+        self.lda = LDAmodel(n_topics=100, n_passes=10, vocabulary='combined')
+        # parameters
+        self.k = 10
+
+    def expand(self, query):
+        tokens = tokenize(query.lower())
+        latent = self.lda.tokens2latent(tokens)
+        extra_terms = []
+        for topic in latent:
+            topn = self.lda.model.show_topic(topicid=topic[0], topn=round(self.k*topic[1]))
+            extra_terms += [e[1] for e in topn]
+        extra_terms = list(set(extra_terms))
+        new_query = query + " " + " ".join(extra_terms)
+        return new_query
+
+    def __str__(self):
+        return self.__class__.__name__
+
+
 if __name__ == "__main__":
-    qe = WeightedW2VExpansion()
-    q = "4 month old, boy, epistaxis, haematemesis, haematochezia, subconjunctival bleeding, petechiae, haematomas, haemangioma, slightly enlarged liver, elevated serum transaminases"
-    print qe.expand(q)
+    qe = LDAExpansion()
+    print qe.expand("4 month old, boy, epistaxis, haematemesis, haematochezia, subconjunctival bleeding, petechiae, haematomas, haemangioma, slightly enlarged liver, elevated serum transaminases")

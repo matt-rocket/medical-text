@@ -5,6 +5,7 @@ from gensim.matutils import sparse2full
 from scoring import kl_divergence
 import os
 import logging
+import pickle
 
 
 class LDAmodel(object):
@@ -18,6 +19,7 @@ class LDAmodel(object):
         self.n_topics = n_topics
         self.vocabulary = vocabulary
         self.filename = "LDAmodel_%s_%s_%s" % (vocabulary, n_topics, n_passes,)
+        self.latent_space_filename = "LATENT_SPACE_LDAmodel_%s_%s_%s" % (vocabulary, n_topics, n_passes,)
         self.dictionary = corpora.Dictionary.load(os.path.join(corpora_folder, "%s.dict" % (vocabulary,)))
         self.corpus = corpora.MmCorpus(os.path.join(corpora_folder, "%s.mm" % (vocabulary,)))
 
@@ -25,25 +27,40 @@ class LDAmodel(object):
         model_exists = os.path.isfile(os.path.join(models_folder, self.filename))
         if model_exists:
             # if model already exists then load it
-            print "loading model.."
+            logging.info("LOADING LDA model from file")
             self.model = models.LdaModel.load(os.path.join(models_folder, self.filename))
         else:
             # train model with given parameters
-            print "training model.."
+            logging.info("STARTING TRAINING - LDA model")
             self.model = self.train(n_topics, n_passes)
             # save model state to file
-            print "saving model.."
+            logging.info("SAVING LDA model")
             self.model.save(os.path.join(models_folder, self.filename))
 
-        # transform corpus to latent variable vectors
-        print "transforming documents to latent space.."
-        self.latent_docs = []
-        count = 1
-        for doc in self.corpus:
-            self.latent_docs.append(self.model[doc])
-            count += 1
-            if count % 1000 == 0:
-                print count, "converted.."
+
+        # does identical model already exists?
+        latent_docs_path = os.path.join(models_folder, self.latent_space_filename)
+        latent_docs_exists = os.path.isfile(latent_docs_path)
+
+        if latent_docs_exists:
+            # load latent vectors from file
+            logging.info("loading latent space vectors..")
+            self.latent_docs = pickle.load(open(latent_docs_path, 'r'))
+        else:
+            # transform corpus to latent variable vectors
+            logging.info("transforming documents to latent space..")
+            self.latent_docs = []
+            count = 1
+            for doc in self.corpus:
+                self.latent_docs.append(self.model[doc])
+                count += 1
+                if count % 1000 == 0:
+                    print count, "converted.."
+            # save to file
+            pickle.dump(self.latent_docs, open(latent_docs_path, 'w'))
+
+    def tokens2latent(self, tokens):
+        return self.model[self.dictionary.doc2bow(tokens)]
 
     def train(self, n_topics, n_passes, update_every=0):
         """
@@ -83,6 +100,7 @@ class LDAmodel(object):
         ranking.sort(key=lambda x: x[1])
 
         return ranking[:top_n]
+
 
 if __name__ == "__main__":
     # setup logging
