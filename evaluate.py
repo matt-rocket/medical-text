@@ -14,6 +14,7 @@ def evaluate(search_engine, k, verbose=False):
 
         recalls = []
         precisions = []
+        ndcgs = []
 
         for record in records:
             qid, query, answer, relevant, partly_relevant = record.split("\t")
@@ -22,17 +23,20 @@ def evaluate(search_engine, k, verbose=False):
             returned_docids = [hit[u'id'] for hit in response.results]
             recalls.append(recall(correct_answers, returned_docids))
             precisions.append(precision(correct_answers, returned_docids))
+            ndcgs.append(ndcg(correct_answers, returned_docids))
             if verbose:
                 print query
                 print "P@%s" % (k,), precision(correct_answers, returned_docids)
                 print "R@%s" % (k,), recall(correct_answers, returned_docids)
                 print "F@%s" % (k,), f_measure(correct_answers, returned_docids)
                 print "Relevant@%s" % (k,), relevant_at_k(correct_answers, returned_docids)
+                print "nDCG@%s" % (k,), ndcg(correct_answers, returned_docids)
             query_results.append((correct_answers, returned_docids))
 
         print str(search_engine)
         print "MAP", mean_average_precision(query_results)
         print "MRR", mean_reciprocal_rank(query_results)
+        print "Avg. nDCG@k", sum(ndcgs)/float(len(ndcgs))
         print "Avg. R@k", sum(recalls)/float(len(recalls))
         print "Avg. P@k", sum(precisions)/float(len(precisions))
         print recalls
@@ -41,10 +45,13 @@ if __name__ == "__main__":
     # setup logging
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # retrieval top k ranked
-    k = 50
+    k = 20
     search_engines = [
         StandardSolrEngine(),
-        StandardSolrEngine(query_expansion=LDAExpansion()),
+        StandardSolrEngine(query_expansion=LDAExpansion(k=5)),
+        StandardSolrEngine(query_expansion=LDAExpansion(k=10)),
+        StandardSolrEngine(query_expansion=LDAExpansion(k=15)),
+        StandardSolrEngine(query_expansion=LDAExpansion(k=20)),
         StandardSolrEngine(query_expansion=AverageW2VExpansion()),
         StandardSolrEngine(query_expansion=TermwiseW2VExpansion()),
         StandardSolrEngine(query_expansion=TermWindowW2VExpansion()),
