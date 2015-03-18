@@ -1,5 +1,6 @@
 __author__ = 'matias'
 
+from math import log
 
 def precision(correct_answers, results):
     relevant_and_retrieved = [doc for doc in results if doc in correct_answers]
@@ -46,6 +47,14 @@ def mean_reciprocal_rank(query_results):
             reciprocal_ranks.append(0.0)
     return sum(reciprocal_ranks)/len(query_results)
 
+
+def ndcg(correct, results):
+    relevance = map(lambda x: 1 if x in correct else 0, results)
+    ordered_relevance = sorted(relevance,reverse=True)
+    dcg = sum([(2.0**relevance[i] - 1)/log(i+2) for i in range(len(relevance))])
+    idcg = sum([(2.0**ordered_relevance[i] - 1)/log(i+2) for i in range(len(ordered_relevance))])
+    result = dcg/idcg if idcg > 0 else 0.0
+    return result
 
 
 def relevant_at_k(correct, results):
