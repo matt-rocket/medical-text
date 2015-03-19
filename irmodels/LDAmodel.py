@@ -107,4 +107,4 @@ if __name__ == "__main__":
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
     # model parameters
-    model = LDAmodel(n_topics=100, n_passes=10, vocabulary="combined")
+    model = LDAmodel(n_topics=200, n_passes=10, vocabulary="combined")

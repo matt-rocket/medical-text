@@ -8,6 +8,7 @@ import logging
 
 def evaluate(search_engine, k, verbose=False):
     with open('evaluation/data/findzebra.tsv','r') as infile:
+
         records = infile.read().split("\n")
 
         query_results = []
@@ -21,9 +22,12 @@ def evaluate(search_engine, k, verbose=False):
             correct_answers = [ans for ans in relevant.split(",") + partly_relevant.split(",") if ans is not '']
             response = search_engine.query(query, top_n=k)
             returned_docids = [hit[u'id'] for hit in response.results]
-            recalls.append(recall(correct_answers, returned_docids))
-            precisions.append(precision(correct_answers, returned_docids))
-            ndcgs.append(ndcg(correct_answers, returned_docids))
+            r = recall(correct_answers, returned_docids)
+            recalls.append(r)
+            p = precision(correct_answers, returned_docids)
+            precisions.append(p)
+            ndcg_value = ndcg(correct_answers, returned_docids)
+            ndcgs.append(ndcg_value)
             if verbose:
                 print query
                 print "P@%s" % (k,), precision(correct_answers, returned_docids)
@@ -33,13 +37,19 @@ def evaluate(search_engine, k, verbose=False):
                 print "nDCG@%s" % (k,), ndcg(correct_answers, returned_docids)
             query_results.append((correct_answers, returned_docids))
 
+        map_value = mean_average_precision(query_results)
+        mrr = mean_reciprocal_rank(query_results)
+        avg_ndcg = sum(ndcgs)/float(len(ndcgs))
+        avg_r = sum(recalls)/float(len(recalls))
+        avg_p = sum(precisions)/float(len(precisions))
         print str(search_engine)
-        print "MAP", mean_average_precision(query_results)
-        print "MRR", mean_reciprocal_rank(query_results)
-        print "Avg. nDCG@k", sum(ndcgs)/float(len(ndcgs))
-        print "Avg. R@k", sum(recalls)/float(len(recalls))
-        print "Avg. P@k", sum(precisions)/float(len(precisions))
-        print recalls
+        #print "MAP", map_value
+        #print "MRR", mrr
+        #print "Avg. nDCG@k", avg_ndcg
+        #print "Avg. R@k", avg_r
+        #print "Avg. P@k", avg_p
+        print map_value, mrr, avg_ndcg, avg_r, avg_p
+        #print recalls
 
 if __name__ == "__main__":
     # setup logging
@@ -47,15 +57,13 @@ if __name__ == "__main__":
     # retrieval top k ranked
     k = 20
     search_engines = [
-        StandardSolrEngine(),
-        StandardSolrEngine(query_expansion=LDAExpansion(k=5)),
-        StandardSolrEngine(query_expansion=LDAExpansion(k=10)),
-        StandardSolrEngine(query_expansion=LDAExpansion(k=15)),
-        StandardSolrEngine(query_expansion=LDAExpansion(k=20)),
-        StandardSolrEngine(query_expansion=AverageW2VExpansion()),
-        StandardSolrEngine(query_expansion=TermwiseW2VExpansion()),
-        StandardSolrEngine(query_expansion=TermWindowW2VExpansion()),
-        StandardSolrEngine(query_expansion=WeightedW2VExpansion()),
+        #StandardSolrEngine(),
+        StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=5.0)),
+        StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=6.0)),
+        StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=7.0)),
+        StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=8.0)),
+        StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=9.0)),
+        StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=10.0)),
         ]
 
     for engine in search_engines:

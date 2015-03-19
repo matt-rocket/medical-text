@@ -6,6 +6,7 @@ from textanalysis.pubmed_tokenize import RawTokenizer, tokenize
 from irmodels.W2Vmodel import W2Vmodel
 from irmodels.TFIDFmodel import TFIDFmodel
 from irmodels.LDAmodel import LDAmodel
+from irmodels.HDPmodel import HDPmodel
 
 
 class QueryExpansion(object):
@@ -18,7 +19,7 @@ class QueryExpansion(object):
 
 class AverageW2VExpansion(QueryExpansion):
 
-    def __init__(self):
+    def __init__(self, p=0.7):
         # phrase detector
         self.phrase_detector = PmiPhraseDetector(RawSentenceStream())
         # number converter
@@ -26,7 +27,7 @@ class AverageW2VExpansion(QueryExpansion):
         # build model
         self.model = W2Vmodel(PhraseSentenceStream(self.phrase_detector))
         # parameters
-        self.p = 0.7
+        self.p = p
         self.n = 10
 
     def expand(self, query):
@@ -42,7 +43,7 @@ class AverageW2VExpansion(QueryExpansion):
 
 class TermwiseW2VExpansion(QueryExpansion):
 
-    def __init__(self):
+    def __init__(self, k=1):
         # phrase detector
         self.phrase_detector = PmiPhraseDetector(RawSentenceStream())
         # number converter
@@ -51,7 +52,7 @@ class TermwiseW2VExpansion(QueryExpansion):
         self.model = W2Vmodel(PhraseSentenceStream(self.phrase_detector))
         # parameters
         self.p = 0.7
-        self.k = 10
+        self.k = k
 
     def expand(self, query):
         phrases = self.phrase_detector.detect(self.tokenizer.tokenize(query.lower()))
@@ -71,7 +72,7 @@ class TermwiseW2VExpansion(QueryExpansion):
 
 class TermWindowW2VExpansion(QueryExpansion):
 
-    def __init__(self):
+    def __init__(self, k=1):
         # phrase detector
         self.phrase_detector = PmiPhraseDetector(RawSentenceStream())
         # number converter
@@ -80,7 +81,7 @@ class TermWindowW2VExpansion(QueryExpansion):
         self.model = W2Vmodel(PhraseSentenceStream(self.phrase_detector))
         # parameters
         self.p = 0.8
-        self.k = 10
+        self.k = k
 
     def expand(self, query):
         phrases = self.phrase_detector.detect(self.tokenizer.tokenize(query.lower()))
@@ -105,7 +106,7 @@ class TermWindowW2VExpansion(QueryExpansion):
 
 class WeightedW2VExpansion(QueryExpansion):
 
-    def __init__(self):
+    def __init__(self, alpha=6.0):
         # phrase detector
         self.phrase_detector = PmiPhraseDetector(RawSentenceStream())
         # number converter
@@ -114,7 +115,7 @@ class WeightedW2VExpansion(QueryExpansion):
         self.w2v = W2Vmodel(PhraseSentenceStream(self.phrase_detector))
         self.tfidf = TFIDFmodel()
         # parameters
-        self.alpha = 6.0
+        self.alpha = alpha
         self.k = 3
         self.p = 0.80
 
@@ -140,27 +141,32 @@ class WeightedW2VExpansion(QueryExpansion):
 
 class LDAExpansion(QueryExpansion):
 
-    def __init__(self):
+    def __init__(self, k=10):
         # build model
-        self.lda = LDAmodel(n_topics=100, n_passes=10, vocabulary='combined')
+        self.lda = LDAmodel(n_topics=200, n_passes=10, vocabulary='combined')
         # parameters
-        self.k = 10
+        self.k = k
 
     def expand(self, query):
         tokens = tokenize(query.lower())
         latent = self.lda.tokens2latent(tokens)
+        print latent
         extra_terms = []
         for topic in latent:
             topn = self.lda.model.show_topic(topicid=topic[0], topn=round(self.k*topic[1]))
             extra_terms += [e[1] for e in topn]
+            print topn
         extra_terms = list(set(extra_terms))
+        print extra_terms
         new_query = query + " " + " ".join(extra_terms)
+        print new_query
         return new_query
 
     def __str__(self):
-        return self.__class__.__name__
+        return self.__class__.__name__ + str("(k=%s)" % self.k )
 
 
 if __name__ == "__main__":
-    qe = LDAExpansion()
+    qe = LDAExpansion(k=20)
     print qe.expand("4 month old, boy, epistaxis, haematemesis, haematochezia, subconjunctival bleeding, petechiae, haematomas, haemangioma, slightly enlarged liver, elevated serum transaminases")
+    #print qe.expand("11 year old, girl, intermittent abdominal pain, mild dorsal scoliosis, low serum phosphate/hypophosphatemia, hypercalcuria, elevated serum 1,25 dihydroxyvitamin D")
