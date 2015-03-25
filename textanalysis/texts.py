@@ -1,11 +1,13 @@
 __author__ = 'matias'
 
 import xml.etree.ElementTree as ET
-import os
 import logging
 from nltk.tokenize import sent_tokenize
 from pubmed_tokenize import SimpleTokenizer, RawTokenizer
 from gensim.models.doc2vec import LabeledSentence
+import os
+from os.path import isfile, join
+import json
 
 
 class SentenceStream(object):
@@ -62,15 +64,12 @@ class PhraseSentenceStream(object):
 
 
 class CaseReportLibrary(object):
-    def __init__(self, filename=None):
-        sections = ['A-B', 'C-H', 'I-N', 'O-Z']
-        self.filenames = []
-        for section in sections:
-            section_filepath = os.path.join(*[os.path.dirname(__file__), "data", "casereportlists",  "case_report_list_%s.txt"]) % section
-            with open(section_filepath) as infile:
-                self.filenames += infile.read().split("\n")
-        if filename:
+    def __init__(self, filename=None, cs_path=r"C:\Users\matias\Desktop\thesis\data\casereports"):
+        if filename is not None:
             self.filenames = [filename]
+        else:
+            self.filenames = [join(cs_path, f) for f in os.listdir(cs_path) if isfile(join(cs_path, f))]
+
 
     def __getitem__(self, item):
         tree = ET.parse(self.filenames[item])
@@ -130,6 +129,39 @@ class CaseReport(object):
         :return: string containing all text in case report
         """
         return " ".join([self.title, " ".join(self.mesh_terms), self.abstract, self.body])
+
+
+class FZArticleLibrary(object):
+    def __init__(self, filename=None, cs_path=r"C:\Users\matias\Desktop\thesis\medical-text\data\articles\findzebra"):
+        if filename is not None:
+            self.filenames = [filename]
+        else:
+            self.filenames = [join(cs_path, f) for f in os.listdir(cs_path) if isfile(join(cs_path, f))]
+
+    def __getitem__(self, item):
+        return self.filenames[item]
+
+    def __iter__(self):
+        for filename in self.filenames:
+            obj = json.load(open(filename, 'r'))
+            title = obj['title']
+            content = obj['content']
+            _id = obj['id']
+            print title, _id
+            yield FZArticle(title=title, content=content, _id=_id)
+
+
+class FZArticle(object):
+    def __init__(self, title, content, _id):
+        self.body = content
+        self.title = title
+        self.id = _id
+
+    def get_text(self):
+        """
+        :return: string containing all text in case report
+        """
+        return " ".join([self.title, self.body])
 
 
 class RareDiseases(set):
