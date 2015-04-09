@@ -8,6 +8,7 @@ from gensim.models.doc2vec import LabeledSentence
 import os
 from os.path import isfile, join
 import json
+from random import shuffle
 
 
 class SentenceStream(object):
@@ -27,8 +28,8 @@ class SentenceStream(object):
 
 
 class RawSentenceStream(object):
-    def __init__(self, extract_func=None):
-        self.docs = CaseReportLibrary()
+    def __init__(self, extract_func=None, fz_docs=False, reshuffles=0):
+        self.docs = FZArticleLibrary(reshuffles=reshuffles) if fz_docs else CaseReportLibrary(reshuffles=reshuffles)
         self.tokenizer = RawTokenizer()
         self.extract_func = extract_func
 
@@ -48,8 +49,8 @@ class RawSentenceStream(object):
 
 
 class PhraseSentenceStream(object):
-    def __init__(self, phrase_detector, extract_func=None):
-        self.stream = RawSentenceStream(extract_func=extract_func)
+    def __init__(self, phrase_detector, extract_func=None, fz_docs=False, reshuffles=0):
+        self.stream = RawSentenceStream(extract_func=extract_func, fz_docs=fz_docs, reshuffles=reshuffles)
         self.detector = phrase_detector
         self.is_labeled = extract_func is not None
 
@@ -63,13 +64,26 @@ class PhraseSentenceStream(object):
             yield sentence
 
 
+class Document(object):
+
+    def get_text(self):
+        raise NotImplementedError()
+
+    def get_id(self):
+        raise NotImplementedError()
+
+
 class CaseReportLibrary(object):
-    def __init__(self, filename=None, cs_path=r"C:\Users\matias\Desktop\thesis\data\casereports"):
+    def __init__(self, filename=None, cs_path=r"C:\Users\matias\Desktop\thesis\data\casereports", reshuffles=0):
         if filename is not None:
             self.filenames = [filename]
         else:
-            self.filenames = [join(cs_path, f) for f in os.listdir(cs_path) if isfile(join(cs_path, f))]
-
+            docs = [join(cs_path, f) for f in os.listdir(cs_path) if isfile(join(cs_path, f))]
+            self.filenames = docs[:]
+            for i in range(reshuffles):
+                reordered_docs = docs[:]
+                shuffle(reordered_docs)
+                self.filenames += reordered_docs
 
     def __getitem__(self, item):
         tree = ET.parse(self.filenames[item])
@@ -83,8 +97,11 @@ class CaseReportLibrary(object):
             tree = ET.parse(filename)
             root = tree.getroot()
             title = root.find('./front/article-meta/title-group/article-title')
+            _id = root.find('./front/article-meta/article-id[@pub-id-type="pmid"]')
             keywords = root.findall('./front/article-meta/kwd-group/kwd')
             abstract = root.find('./front/article-meta/abstract')
+            if _id is not None:
+                _id = ET.tostring(_id, encoding='utf8', method='text')
             if title is not None:
                 title = ET.tostring(title, encoding='utf8', method='text')
             if abstract is not None:
@@ -92,9 +109,9 @@ class CaseReportLibrary(object):
             if keywords is not None:
                 keywords = [ET.tostring(kwd, encoding='utf8', method='text') for kwd in keywords]
             body_node = root.find('./body')
-            if body_node is not None:
+            if body_node is not None and _id is not None:
                 body = ET.tostring(body_node, encoding='utf8', method='text').replace("\n", " ")
-                yield CaseReport(title, body, filename, keywords, abstract)
+                yield CaseReport(_id, title, body, filename, keywords, abstract)
             else:
                 continue
 
@@ -102,8 +119,10 @@ class CaseReportLibrary(object):
         return len(self.filenames)
 
 
-class CaseReport(object):
-    def __init__(self, title, body, filename, mesh_terms, abstract):
+class CaseReport(Document):
+    def __init__(self, _id, title, body, filename, mesh_terms, abstract):
+        self.id = _id
+        self.id_prefix = "CS"
         self.title = title if title is not None else ""
         self.body = body if body is not None else ""
         self.abstract = abstract if abstract is not None else ""
@@ -128,15 +147,23 @@ class CaseReport(object):
         """
         :return: string containing all text in case report
         """
-        return " ".join([self.title, " ".join(self.mesh_terms), self.abstract, self.body])
+        return " ".join([self.title, " ".join(self.mesh_terms), self.abstract, self.body]).decode('utf-8')
+
+    def get_id(self):
+        return self.id_prefix + self.id
 
 
 class FZArticleLibrary(object):
-    def __init__(self, filename=None, cs_path=r"C:\Users\matias\Desktop\thesis\medical-text\data\articles\findzebra"):
+    def __init__(self, filename=None, cs_path=r"C:\Users\matias\Desktop\thesis\medical-text\data\articles\findzebra", reshuffles=0):
         if filename is not None:
             self.filenames = [filename]
         else:
-            self.filenames = [join(cs_path, f) for f in os.listdir(cs_path) if isfile(join(cs_path, f))]
+            docs = [join(cs_path, f) for f in os.listdir(cs_path) if isfile(join(cs_path, f))]
+            self.filenames = docs[:]
+            for i in range(reshuffles):
+                reordered_docs = docs[:]
+                shuffle(reordered_docs)
+                self.filenames += reordered_docs
 
     def __getitem__(self, item):
         return self.filenames[item]
@@ -147,12 +174,15 @@ class FZArticleLibrary(object):
             title = obj['title']
             content = obj['content']
             _id = obj['id']
-            print title, _id
             yield FZArticle(title=title, content=content, _id=_id)
 
+    def __len__(self):
+        return len(self.filenames)
 
-class FZArticle(object):
+
+class FZArticle(Document):
     def __init__(self, title, content, _id):
+        self.id_prefix = "FZ"
         self.body = content
         self.title = title
         self.id = _id
@@ -161,7 +191,10 @@ class FZArticle(object):
         """
         :return: string containing all text in case report
         """
-        return " ".join([self.title, self.body])
+        return ". ".join([self.title, self.body])
+
+    def get_id(self):
+        return self.id_prefix + self.id
 
 
 class RareDiseases(set):
@@ -174,7 +207,7 @@ class RareDiseases(set):
 
 
 def extract_docid(doc):
-    return [doc.title]
+    return "DOCID-" + doc.get_id()
 
 
 def extract_mesh_terms(doc):
