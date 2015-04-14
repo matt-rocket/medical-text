@@ -9,6 +9,7 @@ import os
 from os.path import isfile, join
 import json
 from random import shuffle
+from entityextractor import DiseaseExtractor
 
 
 class SentenceStream(object):
@@ -122,7 +123,7 @@ class CaseReportLibrary(object):
 class CaseReport(Document):
     def __init__(self, _id, title, body, filename, mesh_terms, abstract):
         self.id = _id
-        self.id_prefix = "CS"
+        self.id_prefix = "DOCID-CS"
         self.title = title if title is not None else ""
         self.body = body if body is not None else ""
         self.abstract = abstract if abstract is not None else ""
@@ -135,11 +136,14 @@ class CaseReport(Document):
         :return: list of strings
         """
         if self.title or self.body or self.abstract:
-            sequences = extractor.extract(self.body) + extractor.extract(self.title) + extractor.extract(self.abstract)
-            for term in self.mesh_terms:
-                sequences += extractor.extract(term)
-            entities = list(set([" ".join(seq) for seq in sequences]))
-            return entities
+            try:
+                sequences = extractor.extract(self.body) + extractor.extract(self.title) + extractor.extract(self.abstract)
+                for term in self.mesh_terms:
+                    sequences += extractor.extract(term)
+                entities = [term for term in set(sequences) if term is not "1"]
+                return entities
+            except UnicodeDecodeError:
+                return []
         else:
             return []
 
@@ -182,7 +186,7 @@ class FZArticleLibrary(object):
 
 class FZArticle(Document):
     def __init__(self, title, content, _id):
-        self.id_prefix = "FZ"
+        self.id_prefix = "DOCID-FZ"
         self.body = content
         self.title = title
         self.id = _id
@@ -196,6 +200,8 @@ class FZArticle(Document):
     def get_id(self):
         return self.id_prefix + self.id
 
+    def get_entities(self, extractor):
+        return []
 
 class RareDiseases(set):
     def __init__(self):
@@ -207,8 +213,26 @@ class RareDiseases(set):
 
 
 def extract_docid(doc):
-    return "DOCID-" + doc.get_id()
+    return [doc.get_id()]
 
 
 def extract_mesh_terms(doc):
-    return doc.mesh_terms
+    return ["MESH-"+str(term) for term in doc.mesh_terms]
+
+class ExtractDiseases(object):
+
+    def __init__(self):
+        self.disease_extractor = DiseaseExtractor()
+        self.cached_doc = None
+        self.cache = None
+
+    def __call__(self, *args, **kwargs):
+        doc = args[0]
+        doc_id = doc.get_id()
+        if doc_id == self.cached_doc:
+            return self.cache
+        else:
+            entities = doc.get_entities(extractor=self.disease_extractor)
+            self.cache = entities
+            self.cached_doc = doc_id
+            return entities
