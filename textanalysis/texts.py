@@ -99,10 +99,13 @@ class CaseReportLibrary(object):
             root = tree.getroot()
             title = root.find('./front/article-meta/title-group/article-title')
             _id = root.find('./front/article-meta/article-id[@pub-id-type="pmid"]')
+            pmcid = root.find('./front/article-meta/article-id[@pub-id-type="pmc"]')
             keywords = root.findall('./front/article-meta/kwd-group/kwd')
             abstract = root.find('./front/article-meta/abstract')
             if _id is not None:
                 _id = ET.tostring(_id, encoding='utf8', method='text')
+            if pmcid is not None:
+                pmcid = ET.tostring(pmcid, encoding='utf8', method='text')
             if title is not None:
                 title = ET.tostring(title, encoding='utf8', method='text')
             if abstract is not None:
@@ -112,7 +115,7 @@ class CaseReportLibrary(object):
             body_node = root.find('./body')
             if body_node is not None and _id is not None:
                 body = ET.tostring(body_node, encoding='utf8', method='text').replace("\n", " ")
-                yield CaseReport(_id, title, body, filename, keywords, abstract)
+                yield CaseReport(_id, pmcid, title, body, filename, keywords, abstract)
             else:
                 continue
 
@@ -121,8 +124,9 @@ class CaseReportLibrary(object):
 
 
 class CaseReport(Document):
-    def __init__(self, _id, title, body, filename, mesh_terms, abstract):
+    def __init__(self, _id, pmcid, title, body, filename, mesh_terms, abstract):
         self.id = _id
+        self.pmcid = pmcid
         self.id_prefix = "DOCID-CS"
         self.title = title if title is not None else ""
         self.body = body if body is not None else ""
@@ -155,6 +159,12 @@ class CaseReport(Document):
 
     def get_id(self):
         return self.id_prefix + self.id
+
+    def get_pmcid(self):
+        return self.pmcid
+
+    def get_abstract(self):
+        return self.abstract if self.abstract is not None else ""
 
 
 class FZArticleLibrary(object):
@@ -233,6 +243,7 @@ class ExtractDiseases(object):
             return self.cache
         else:
             entities = doc.get_entities(extractor=self.disease_extractor)
+            entities = ["DISEASE-"+entity for entity in entities]
             self.cache = entities
             self.cached_doc = doc_id
             return entities
