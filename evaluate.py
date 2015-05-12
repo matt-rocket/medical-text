@@ -1,13 +1,13 @@
 __author__ = 'matias'
 
-from search import StandardSolrEngine
+from search import StandardSolrEngine, Doc2VecSearchEngine, ElasticSearchEngine
 from queryexpansion import *
 from evaluation.metrics import *
 import logging
 
 
-def evaluate(search_engine, k, verbose=False):
-    with open('evaluation/data/findzebra.tsv','r') as infile:
+def evaluate(search_engine, k, verbose=False, eval_file='findzebra.tsv'):
+    with open('evaluation/data/%s' % (eval_file,), 'r') as infile:
 
         records = infile.read().split("\n")
 
@@ -21,7 +21,7 @@ def evaluate(search_engine, k, verbose=False):
             qid, query, answer, relevant, partly_relevant = record.split("\t")
             correct_answers = [ans for ans in relevant.split(",") + partly_relevant.split(",") if ans is not '']
             response = search_engine.query(query, top_n=k)
-            returned_docids = [hit[u'id'] for hit in response.results]
+            returned_docids = [hit[u'id'] for hit in response]
             r = recall(correct_answers, returned_docids)
             recalls.append(r)
             p = precision(correct_answers, returned_docids)
@@ -57,14 +57,13 @@ if __name__ == "__main__":
     # retrieval top k ranked
     k = 20
     search_engines = [
+        ElasticSearchEngine(),
+        ElasticSearchEngine(index='casereports_snowball'),
+        ElasticSearchEngine(index='casereports_english'),
         #StandardSolrEngine(),
-        StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=5.0)),
-        StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=6.0)),
-        StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=7.0)),
-        StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=8.0)),
-        StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=9.0)),
-        StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=10.0)),
+        #Doc2VecSearchEngine(),
+        #StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=5.0)),
         ]
 
     for engine in search_engines:
-        evaluate(engine, k, verbose=False)
+        evaluate(engine, k, verbose=False, eval_file='casereports_1_2014.tsv')
