@@ -1,10 +1,10 @@
 __author__ = 'matias'
 
 import solr
+import elasticsearch
 from textanalysis.texts import RawSentenceStream, PhraseSentenceStream, FZArticleLibrary, extract_docid
 from textanalysis.phrasedetection import PmiPhraseDetector
 from irmodels.D2Vmodel import D2Vmodel, DocIndex
-from nltk.tokenize import sent_tokenize, word_tokenize
 from scipy.spatial.distance import cosine
 from heapq import heappush
 
@@ -16,6 +16,38 @@ class SearchEngine(object):
 
     def query(self, query_str, top_n=20):
         raise NotImplementedError()
+
+
+class ElasticSearchEngine(SearchEngine):
+    def __init__(self, query_expansion=None, index="casereports"):
+        self.es = elasticsearch.Elasticsearch()
+        self.name = "Standard ElasticSearch Engine"
+        self.query_expansion = query_expansion
+        self.index = index
+
+    def __str__(self):
+        if self.query_expansion is not None:
+            string = "%s with %s" % (self.name, self.query_expansion,)
+        else:
+            string = self.name
+        return string
+
+    def query(self, query_str, top_n=20):
+        # expand query
+        if self.query_expansion is not None:
+            query_str = self.query_expansion.expand(query_str)
+        # remove special Solr query chars
+        query_str = query_str.replace(":", "")
+        search_results = [hit['_source'] for hit in self.es.search(self.index,
+                                                          q=query_str,
+                                                          default_operator='OR',
+                                                          size=top_n,
+                                                          #body={'query':{'match_all':{}}}
+                                                          )['hits']['hits']]
+        results = [{'title':hit['title'], 'description': hit['title'], 'related': [], 'id':hit['pmcid']} for hit in search_results]
+        print results
+        return results
+
 
 
 class StandardSolrEngine(SearchEngine):
@@ -37,7 +69,7 @@ class StandardSolrEngine(SearchEngine):
             query_str = self.query_expansion.expand(query_str)
         # remove special Solr query chars
         query_str = query_str.replace(":", "")
-        return self.solr_con.query(query_str, rows=top_n)
+        return self.solr_con.query(query_str, rows=top_n).results
 
 
 class TwoPhaseSearchEngine(SearchEngine):
@@ -70,12 +102,7 @@ class Doc2VecSearchEngine(SearchEngine):
         return "Doc2Vec Search Engine"
 
     def query(self, query_str, top_n=20):
-        text = query_str.lower()
-        tokens = []
-        for sent in sent_tokenize(text):
-            tokens += word_tokenize(sent)
-        phrases = self.phrase_detector.detect(tokens)
-        query_vec = self.model.inner_model.infer_vector(phrases, steps=100)
+        query_vec = self.model.infer_doc_vector(query_str, steps=50, phrase_detector=self.phrase_detector)
 
         ranking = []
 
@@ -85,8 +112,16 @@ class Doc2VecSearchEngine(SearchEngine):
                 distance = cosine(query_vec, doc_vec)
                 heappush(ranking, (distance, word))
 
-        return ranking[:top_n]
+        # make top results similar to Solr results
+        top_ranked = ranking[:top_n]
+        solr_like_results = []
+        for entry in top_ranked:
+            score = entry[0]
+            title = self.doc_index[entry[1]]
+            _id = entry[1][8:]
+            solr_like_results.append({'id': _id, 'score': score, 'title': title})
 
+        return solr_like_results
 
 
 
@@ -95,7 +130,7 @@ if __name__ == "__main__":
     engine.solr_con
     query_input = raw_input("search for:")
     while query_input is not "":
-        hits = engine.query(query_input, 50).results
+        hits = engine.query(query_input, 50)
         relevant = []
         partly_relevant = []
         print "--------- RESULTS ---------"

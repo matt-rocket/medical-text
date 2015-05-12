@@ -1,0 +1,10 @@
+{
+  "analysis": {
+    "analyzer": {
+      "csanalyzer": {
+        "type": "snowball",
+        "language": "english"
+      }
+    }
+  }
+}

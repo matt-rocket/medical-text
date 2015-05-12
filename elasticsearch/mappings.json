@@ -1,0 +1,34 @@
+{
+  "casereport": {
+    "properties": {
+      "title": {
+        "index": "analyzed",
+        "type": "string"
+      },
+      "text": {
+        "index": "analyzed",
+        "type": "string",
+        "analyzer": "english"
+      },
+      "abstract": {
+        "index": "not_analyzed",
+        "type": "string"
+      },
+      "filename": {
+        "index": "not_analyzed",
+        "type": "string"
+      },
+      "cui": {
+        "index": "not_analyzed",
+        "type": "string"
+      },
+      "pmcid": {
+        "index": "not_analyzed",
+        "type": "string"
+      }
+    },
+    "_source": {
+      "enabled": true
+    }
+  }
+}
