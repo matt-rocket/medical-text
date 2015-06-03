@@ -158,7 +158,7 @@ class CaseReport(Document):
         return " ".join([self.title, " ".join(self.mesh_terms), self.abstract, self.body]).decode('utf-8')
 
     def get_id(self):
-        return self.id_prefix + self.id
+        return self.id_prefix + self.get_pmcid()
 
     def get_pmcid(self):
         return self.pmcid

@@ -57,11 +57,20 @@ if __name__ == "__main__":
     # retrieval top k ranked
     k = 20
     search_engines = [
-        ElasticSearchEngine(),
-        ElasticSearchEngine(index='casereports_snowball'),
-        ElasticSearchEngine(index='casereports_english'),
+        #ElasticSearchEngine(),
+        #ElasticSearchEngine(index='casereports_snowball'),
+        #ElasticSearchEngine(index='casereports_english'),
         #StandardSolrEngine(),
-        #Doc2VecSearchEngine(),
+        #Doc2VecSearchEngine(size=10),
+        #Doc2VecSearchEngine(size=15),
+        #Doc2VecSearchEngine(size=20),
+        #Doc2VecSearchEngine(size=25),
+        #Doc2VecSearchEngine(size=30),
+        #Doc2VecSearchEngine(size=35),
+        #Doc2VecSearchEngine(size=40),
+        #Doc2VecSearchEngine(size=45),
+        #Doc2VecSearchEngine(size=50),
+        Doc2VecSearchEngine(modelfile="DOC2VEC_CASEREPORT_DOCID_6_40"),
         #StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=5.0)),
         ]
 

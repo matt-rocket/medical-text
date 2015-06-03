@@ -17,6 +17,7 @@ print m.inner_model.most_similar_cosmul(u"testicles".split(), u"woman".split())
 print m.inner_model.most_similar_cosmul(u"blood red".split(), u"stool".split())
 print m.inner_model.most_similar_cosmul(u"asacol ibd".split(), u"methotrexate".split())
 
+"""
 print m.inner_model.most_similar_cosmul(u"asacol".split())
 print m.inner_model.most_similar_cosmul(u"colitis".split())
 print m.inner_model.most_similar_cosmul(u"lupus".split())
@@ -26,5 +27,5 @@ print m.inner_model.most_similar_cosmul(u"pain".split())
 print m.inner_model.most_similar_cosmul(u"glaucoma".split())
 print m.inner_model.most_similar_cosmul(u"huntington".split())
 print m.inner_model.most_similar_cosmul(u"alzheimer".split())
-
+"""
 

@@ -10,7 +10,8 @@ class PmiPhraseDetector(object):
     """
     Detection using Pointwise Mutual Information (PMI)
     """
-    def __init__(self, sentences):
+    def __init__(self, sentences, filename=None):
+
         # model parameters
         self.sentences = sentences
         self.dataset = "CASEREPORT"
@@ -23,7 +24,8 @@ class PmiPhraseDetector(object):
 
         # data file path
         models_folder = os.path.join(*[os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'models'])
-        filename = "PHRASE_%s_%s_%s_%s" % (self.threshold, self.decay, self.dataset, self.tokenizer, )
+        if filename is None:
+            filename = "PHRASE_%s_%s_%s_%s" % (self.threshold, self.decay, self.dataset, self.tokenizer, )
         self.filepath = os.path.join(models_folder, filename)
 
         # does identical model already exists?

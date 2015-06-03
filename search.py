@@ -3,6 +3,7 @@ __author__ = 'matias'
 import solr
 import elasticsearch
 from textanalysis.texts import RawSentenceStream, PhraseSentenceStream, FZArticleLibrary, extract_docid
+from textanalysis.texts import CaseReportLibrary
 from textanalysis.phrasedetection import PmiPhraseDetector
 from irmodels.D2Vmodel import D2Vmodel, DocIndex
 from scipy.spatial.distance import cosine
@@ -87,16 +88,19 @@ class TwoPhaseSearchEngine(SearchEngine):
 
 class Doc2VecSearchEngine(SearchEngine):
 
-    def __init__(self):
+    def __init__(self, size = 50, modelfile=None):
         self.phrase_detector = PmiPhraseDetector(RawSentenceStream(fz_docs=False))
         # build model
-        epochs = 10
+        epochs = 2
         self.model = D2Vmodel(
             PhraseSentenceStream(self.phrase_detector, extract_func=extract_docid, fz_docs=True, reshuffles=epochs-1),
             name="DOCID",
-            dataset_name="FINDZEBRA",
-            epochs=epochs)
-        self.doc_index = DocIndex(FZArticleLibrary(), "FINDZEBRA")
+            dataset_name="CASEREPORT",
+            epochs=epochs,
+            dimension=size,
+            modelfile=modelfile,
+        )
+        self.doc_index = DocIndex(CaseReportLibrary(), "CASEREPORT")
 
     def __str__(self):
         return "Doc2Vec Search Engine"
@@ -107,7 +111,7 @@ class Doc2VecSearchEngine(SearchEngine):
         ranking = []
 
         for word in self.model.inner_model.vocab:
-            if word.startswith("DOCID-FZ"):
+            if word.startswith("DOCID-CS"):
                 doc_vec = self.model.inner_model[word]
                 distance = cosine(query_vec, doc_vec)
                 heappush(ranking, (distance, word))
@@ -120,6 +124,8 @@ class Doc2VecSearchEngine(SearchEngine):
             title = self.doc_index[entry[1]]
             _id = entry[1][8:]
             solr_like_results.append({'id': _id, 'score': score, 'title': title})
+
+        print solr_like_results
 
         return solr_like_results
 
