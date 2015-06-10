@@ -141,25 +141,24 @@ class WeightedW2VExpansion(QueryExpansion):
 
 class LDAExpansion(QueryExpansion):
 
-    def __init__(self, k=10):
+    def __init__(self, k=10, lda_model=None):
         # build model
-        self.lda = LDAmodel(n_topics=200, n_passes=10, vocabulary='combined')
+        if lda_model:
+            self.lda = lda_model
+        else:
+            self.lda = LDAmodel(n_topics=500, n_passes=50, vocabulary='combined')
         # parameters
         self.k = k
 
     def expand(self, query):
         tokens = tokenize(query.lower())
         latent = self.lda.tokens2latent(tokens)
-        print latent
         extra_terms = []
         for topic in latent:
             topn = self.lda.model.show_topic(topicid=topic[0], topn=round(self.k*topic[1]))
             extra_terms += [e[1] for e in topn]
-            print topn
         extra_terms = list(set(extra_terms))
-        print extra_terms
         new_query = query + " " + " ".join(extra_terms)
-        print new_query
         return new_query
 
     def __str__(self):
@@ -167,6 +166,7 @@ class LDAExpansion(QueryExpansion):
 
 
 if __name__ == "__main__":
-    qe = LDAExpansion(k=20)
+    #qe = LDAExpansion(k=20)
+    qe = WeightedW2VExpansion()
     print qe.expand("4 month old, boy, epistaxis, haematemesis, haematochezia, subconjunctival bleeding, petechiae, haematomas, haemangioma, slightly enlarged liver, elevated serum transaminases")
     #print qe.expand("11 year old, girl, intermittent abdominal pain, mild dorsal scoliosis, low serum phosphate/hypophosphatemia, hypercalcuria, elevated serum 1,25 dihydroxyvitamin D")
