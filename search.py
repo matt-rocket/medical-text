@@ -8,6 +8,8 @@ from textanalysis.phrasedetection import PmiPhraseDetector
 from irmodels.D2Vmodel import D2Vmodel, DocIndex
 from scipy.spatial.distance import cosine
 from heapq import heappush
+import re
+
 
 
 
@@ -39,6 +41,9 @@ class ElasticSearchEngine(SearchEngine):
             query_str = self.query_expansion.expand(query_str)
         # remove special Solr query chars
         query_str = query_str.replace(":", "")
+        query_str = query_str.replace("/", "")#filter(lambda x: str.isalnum(x) or x == " " or x == "_", query_str)
+        #print "PRINTING STRING", string
+        #print "PRINTING REPLACED", string.replace("/", "")
         search_results = [hit['_source'] for hit in self.es.search(self.index,
                                                           q=query_str,
                                                           default_operator='OR',
