@@ -1,38 +1,23 @@
-__author__ = 'matias'
+import logging
+from irmodels.W2Vmodel import W2Vmodel
+from textanalysis.texts import PhraseSentenceStream, RawSentenceStream
+from textanalysis.phrasedetection import PmiPhraseDetector
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+
+# setup logging
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+# phrase detector
+phrase_detector = PmiPhraseDetector(RawSentenceStream())
+# build model
+m = W2Vmodel(PhraseSentenceStream(phrase_detector))
 
 
-from textanalysis.texts import CaseReportLibrary, RawSentenceStream, PhraseSentenceStream
-from textanalysis.texts import extract_mesh_terms
-from textanalysis.pubmed_tokenize import tokenize
-from textanalysis.entityextractor import DiseaseExtractor, SymptomExtractor
+with open("dump.txt", 'r') as infile:
+    items = infile.read().lower().split(",")
 
-
-symptom_extractor = SymptomExtractor()
-disease_extractor = DiseaseExtractor()
-
-doc_lengths = []
-diseases = []
-symptoms = []
-
-
-count = 0
-has_mesh = 0
-for case in CaseReportLibrary():
-    text = case.get_text()
-    doc_lengths.append(len(tokenize(text)))
-    diseases += disease_extractor.extract(text)
-    symptoms += symptom_extractor.extract(text)
-    mesh_terms = extract_mesh_terms(case)
-    count += 1
-    if mesh_terms:
-        has_mesh += 1
-    print count
-
-
-diseases = set(diseases)
-symptoms = set(symptoms)
-
-print "Avg doc length:", sum(doc_lengths)/float(count)
-print "Diseases:", len(diseases)
-print "Symptoms:", len(symptoms)
-print "Has MeSH terms:", 100 * float(has_mesh)/count, "%"
+with open("dumpmedication.txt", 'w') as outfile:
+    for e in items:
+        if e in m.inner_model.vocab:
+            outfile.write("9,%s\n" % (e, ))

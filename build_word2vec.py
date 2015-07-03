@@ -13,11 +13,21 @@ phrase_detector = PmiPhraseDetector(RawSentenceStream())
 # build model
 m = W2Vmodel(PhraseSentenceStream(phrase_detector))
 
-print m.inner_model.most_similar_cosmul(u"lipoma lymphangioma".split(), u"fat".split())
-print m.inner_model.most_similar_cosmul(u"osteoma fibroma".split(), u"bone".split())
-print m.inner_model.most_similar_cosmul(u"chondroma adenoma".split(), u"cartilage".split())
-print m.inner_model.most_similar_cosmul(u"hiv leukemia".split(), u"abacavir".split())
+symptoms = []
+for line in file("data/misc/symptoms.txt").read().split("\n")[:-1]:
+    cui, name = line.split("\t")
+    name = name.lower().replace(" ", "_")
+    symptoms.append(name)
 
+for symp in symptoms:
+    if symp in m.inner_model.vocab:
+        print symp, "->", m.inner_model.most_similar_cosmul(symp.split())
+
+"""
+for word in m.inner_model.vocab:
+    if word in symptoms:
+        print word
+"""
 
 """
 print m.inner_model.most_similar_cosmul(u"asacol".split())

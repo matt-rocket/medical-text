@@ -1,12 +1,12 @@
 __author__ = 'matias'
 
-from search import StandardSolrEngine, Doc2VecSearchEngine, ElasticSearchEngine
+from search import StandardSolrEngine, Doc2VecSearchEngine, ElasticSearchEngine, RandomSearchEngine
 from queryexpansion import *
 from evaluation.metrics import *
 import logging
 
 
-def evaluate(search_engine, k, verbose=False, eval_file='findzebra.tsv'):
+def evaluate(search_engine, k, verbose=False, eval_file='findzebra2.tsv'):
     with open('evaluation/data/%s' % (eval_file,), 'r') as infile:
 
         records = infile.read().split("\n")
@@ -56,24 +56,11 @@ if __name__ == "__main__":
     # setup logging
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # retrieval top k ranked
-    lda_model = LDAmodel(n_topics=500, n_passes=50, vocabulary='combined', latent_vectors=False)
+    # lda_model = LDAmodel(n_topics=500, n_passes=50, vocabulary='combined', latent_vectors=False)
     k = 20
     search_engines = [
-        ElasticSearchEngine(query_expansion=LDAExpansion(k=1, lda_model=lda_model)),
-        ElasticSearchEngine(query_expansion=LDAExpansion(k=2, lda_model=lda_model)),
-        ElasticSearchEngine(query_expansion=LDAExpansion(k=3, lda_model=lda_model)),
-        ElasticSearchEngine(query_expansion=LDAExpansion(k=4, lda_model=lda_model)),
-        ElasticSearchEngine(query_expansion=LDAExpansion(k=5, lda_model=lda_model)),
-        ElasticSearchEngine(query_expansion=LDAExpansion(k=10, lda_model=lda_model)),
-        ElasticSearchEngine(query_expansion=LDAExpansion(k=15, lda_model=lda_model)),
-        ElasticSearchEngine(query_expansion=LDAExpansion(k=20, lda_model=lda_model)),
-        ElasticSearchEngine(query_expansion=LDAExpansion(k=25, lda_model=lda_model)),
-        ElasticSearchEngine(query_expansion=LDAExpansion(k=30, lda_model=lda_model)),
-        ElasticSearchEngine(query_expansion=LDAExpansion(k=35, lda_model=lda_model)),
-        ElasticSearchEngine(query_expansion=LDAExpansion(k=30, lda_model=lda_model)),
-        ElasticSearchEngine(query_expansion=LDAExpansion(k=45, lda_model=lda_model)),
-        ElasticSearchEngine(query_expansion=LDAExpansion(k=50, lda_model=lda_model)),
-        #ElasticSearchEngine(index='casereports_english'),
+        #RandomSearchEngine(),
+        #ElasticSearchEngine(),
         #StandardSolrEngine(),
         #Doc2VecSearchEngine(size=10),
         #Doc2VecSearchEngine(size=15),
@@ -85,7 +72,7 @@ if __name__ == "__main__":
         #Doc2VecSearchEngine(size=45),
         #Doc2VecSearchEngine(size=50),
         #Doc2VecSearchEngine(modelfile="DOC2VEC_CASEREPORT_DOCID_6_40"),
-        #StandardSolrEngine(query_expansion=WeightedW2VExpansion(alpha=5.0)),
+        ElasticSearchEngine(query_expansion=AverageW2VExpansion(p=0.9)),
         ]
 
     for engine in search_engines:

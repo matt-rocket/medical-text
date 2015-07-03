@@ -14,17 +14,18 @@ from collections import Counter
 import matplotlib.pyplot as plt
 
 
-labels = json.load(open('classification/data/labels.json'))
-bow = np.loadtxt(open('classification/data/bow.txt'))
-tfidf = np.loadtxt(open('classification/data/tfidf.txt'))
+labels = json.load(open('classification/data/labels_500.json'))
+bow = np.loadtxt(open('classification/data/bow_500.txt'))
+tfidf = np.loadtxt(open('classification/data/tfidf_500.txt'))
+ngram = np.loadtxt(open('classification/data/ngram_500.txt'))
 rands = np.random.rand(len(labels['labels']), 10)
 
-docvec_counts = [40, 45, 50]#[5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+docvec_counts = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
 
-inputs = {}#{'bow': bow, 'rands': rands, 'tfidf': tfidf}
+inputs = {'bigram': ngram}#{'bow': bow, 'rands': rands, 'tfidf': tfidf}
 
 for count in docvec_counts:
-    inputs["docvecs"+str(count)] = np.loadtxt(open("classification/data/docvecs%s.txt" % (count, )))
+    inputs["docvecs"+str(count)] = np.loadtxt(open("classification/data/docvecs%s_500.txt" % (count, )))
 
 
 y = np.array([int(x) for x in labels['labels']])
@@ -44,19 +45,19 @@ class_counts = Counter(y)
 class_weight = {n: float(class_counts[n])/sum(class_counts.values()) for n in class_counts}
 
 classifiers = {
-    #'logit':{
-    #    'classifier': LogisticRegression(),
-    #    'parameters': {'C': list(np.linspace(1e-4, 1e4)), 'penalty': ['l1', 'l2'], 'dual': [False]},
-    #},
-    'random forest':{
-        'classifier': RandomForestClassifier(),
-        'parameters': {
-            'n_estimators': range(10,100,5),
-            'min_samples_split': range(1,10,1),
-            'min_samples_leaf': range(1,5,1),
-            'criterion': ['gini']
-        }
-    }
+    'logit':{
+        'classifier': LogisticRegression(),
+        'parameters': {'C': list(np.linspace(1e-4, 1e4)), 'penalty': ['l1', 'l2'], 'dual': [False]},
+    },
+    #'random forest':{
+    #    'classifier': RandomForestClassifier(),
+    #    'parameters': {
+    #        'n_estimators': range(10,100,5),
+    #        'min_samples_split': range(1,10,1),
+    #        'min_samples_leaf': range(1,5,1),
+    #        'criterion': ['gini']
+    #    }
+    #}
 }
 
 

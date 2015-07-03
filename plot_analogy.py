@@ -45,7 +45,7 @@ pca.fit(X)
 # transform drug data
 PC = pca.transform(X)
 
-marker_words = ['depression', 'escitalopram', 'tumor', 'imatinib']
+marker_words = ['paroxetine', 'rituximab', 'rituxan', 'lymphoma', 'depression', 'escitalopram', 'tumor', 'imatinib']
 
 # plot PC1 and PC2
 pcs = (0, 1)

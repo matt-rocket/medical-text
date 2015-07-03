@@ -9,6 +9,7 @@ from irmodels.D2Vmodel import D2Vmodel, DocIndex
 from scipy.spatial.distance import cosine
 from heapq import heappush
 import re
+import random
 
 
 
@@ -76,6 +77,30 @@ class StandardSolrEngine(SearchEngine):
         # remove special Solr query chars
         query_str = query_str.replace(":", "")
         return self.solr_con.query(query_str, rows=top_n).results
+
+
+class RandomSearchEngine(SearchEngine):
+
+    def __init__(self):
+        print "start"
+        self.docids = [doc.get_id() for doc in CaseReportLibrary()]
+        print "end"
+
+    def __str__(self):
+        return "RandomSearchEngine"
+
+    def query(self, query_str, top_n=20):
+        random.shuffle(self.docids)
+        result = self.docids[:top_n]
+        solr_like_results = []
+        for entry in result:
+            score = 0.0
+            title = entry
+            _id = entry[6:]
+            solr_like_results.append({'id': _id, 'score': score, 'title': title})
+        return solr_like_results
+
+
 
 
 class TwoPhaseSearchEngine(SearchEngine):

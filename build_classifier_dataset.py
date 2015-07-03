@@ -14,10 +14,10 @@ class LabeledCases(object):
         self.return_object = return_object
         with open("classification/data/class.txt", 'r') as infile:
             lines = infile.read().split("\n")[:-1]
+            count = 0
             for line in lines:
                 pmcid, cls = line.split(" ")
                 self.labels[pmcid] = cls
-
 
     def __iter__(self):
         i = 1
@@ -34,6 +34,8 @@ class LabeledCases(object):
                 if i % 50 == 0:
                     msg = str("Streamed %s labeled case reports" % (i, ))
                     logging.info(msg)
+            if i > 500:
+                break
 
     def __len__(self):
         return len(self.cases)
@@ -44,6 +46,7 @@ if __name__ == "__main__":
     corpus = LabeledCases()
     vectorizer = CountVectorizer(min_df=1, max_features=5000).fit(corpus)
     tfidf_vectorizer = TfidfVectorizer(min_df=1, max_features=5000).fit(corpus)
+    ngram_vectorizer = TfidfVectorizer(min_df=1, ngram_range=(1, 2), max_features=15000).fit(corpus)
     ids = []
     docs = []
     labels = []
@@ -59,15 +62,19 @@ if __name__ == "__main__":
 
     bow = vectorizer.fit_transform(docs).toarray()
     tfidf = tfidf_vectorizer.fit_transform(docs).toarray()
+    ngram = ngram_vectorizer.fit_transform(docs).toarray()
 
-    with open('classification/data/labels.json', 'w') as outfile:
+    with open('classification/data/labels_500.json', 'w') as outfile:
         json.dump({'ids': ids, 'labels': labels}, outfile)
 
-    with open('classification/data/bow.txt', 'w') as outfile:
+    with open('classification/data/bow_500.txt', 'w') as outfile:
         np.savetxt(outfile, bow)
 
-    with open('classification/data/tfidf.txt', 'w') as outfile:
+    with open('classification/data/tfidf_500.txt', 'w') as outfile:
         np.savetxt(outfile, tfidf)
+
+    with open('classification/data/ngram_500.txt', 'w') as outfile:
+        np.savetxt(outfile, ngram)
 
 
     for docvecs_count in docvecs_counts:
@@ -85,7 +92,7 @@ if __name__ == "__main__":
             docvecs[idx, :] = d2v.inner_model['DOCID-CS'+str(pmcid)]
 
 
-        docvecs_filepath = str("classification/data/docvecs%s.txt" % (docvecs_count,))
+        docvecs_filepath = str("classification/data/docvecs%s_500.txt" % (docvecs_count,))
         with open(docvecs_filepath, 'w') as outfile:
             np.savetxt(outfile, docvecs)
 
@@ -104,6 +111,6 @@ if __name__ == "__main__":
             superdocvecs[idx, :] = d2v.inner_model['DOCID-CS'+str(pmcid)]
 
 
-        superdocvecs_filepath = str("classification/data/superdocvecs%s.txt" % (superdocvecs_count,))
+        superdocvecs_filepath = str("classification/data/superdocvecs%s_500.txt" % (superdocvecs_count,))
         with open(superdocvecs_filepath, 'w') as outfile:
             np.savetxt(outfile, superdocvecs)

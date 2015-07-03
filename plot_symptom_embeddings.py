@@ -15,17 +15,16 @@ phrase_detector = PmiPhraseDetector(RawSentenceStream())
 m = W2Vmodel(PhraseSentenceStream(phrase_detector))
 
 diseases = {}
-drugs = {}
+symptoms = {}
 
 with open("testdiseases.txt", 'r') as infile:
     for line in infile.read().split("\n")[:-1]:
         parts = line.split(",")
         diseases[parts[1]] = int(parts[0])
 
-with open("testmedication.txt", 'r') as infile:
+with open("testsymptoms.txt", 'r') as infile:
     for line in infile.read().split("\n")[:-1]:
-        parts = line.split(",")
-        drugs[parts[1]] = int(parts[0])
+        symptoms[line] = 1
 
 # disease data
 keywords = diseases.keys()
@@ -39,7 +38,7 @@ pca = PCA(n_components=4)
 pca.fit(X)
 
 # disease data
-keywords = drugs.keys()
+keywords = symptoms.keys()
 D = np.zeros(shape=(len(keywords), m.inner_model.layer1_size))
 for idx, word in enumerate(keywords):
     if word in m.inner_model.vocab:
@@ -50,35 +49,15 @@ PC = pca.transform(D)
 
 weights = {6:50, 9:100, 1:50, 13:100}
 # plot PC1 and PC2
-marker_words =  [ 'prozac', 'rituximab', 'lithium', 'phenytoin', 'pimozide', 'lamotrigine', 'clonazepam', 'methylphenidate',
-    'cmf',
-    'caf',
-    'tpf',
-    'fulvestrant',
-    'lamotrigine',
-    'acyclovir',
-    'nevirapine',
-    'foscarnet',
-    'lamivudine',
-    'cvp',
-    'xelox',
-    'minoxidil',
-    'oxacillin',
-    'amoxicillin',
-    'warfarin',
-    'nadolol',
-    'carvedilol',
-    'bisoprolol',
-    'timolol',
-]
-keywords = drugs.keys() #[]
-#marker_words = keywords
+marker_words =  []
+keywords = symptoms.keys() #[]
+marker_words = keywords
 
 pcs = (0, 1)
-classes = ['Antibiotics', 'Neurological drugs', 'Chemotherapy drugs', 'Heart medicine']
-class_colours = ['yellow', 'k', 'c', 'b']
-label2index = {label:idx for idx, label in enumerate(set(drugs.values()))}
-color_map = [class_colours[label2index[c]] for c in drugs.values()]
+classes = ['Symptoms']
+class_colours = ['yellow']
+label2index = {label:idx for idx, label in enumerate(set(symptoms.values()))}
+color_map = [class_colours[label2index[c]] for c in symptoms.values()]
 
 plt.figure(figsize=(20, 20))
 plt.scatter(PC[:, pcs[0]], PC[:, pcs[1]], c=color_map, s=30, alpha=0.5, edgecolors='none')

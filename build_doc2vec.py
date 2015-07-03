@@ -21,12 +21,11 @@ epochs = 2
 m = D2Vmodel(
     PhraseSentenceStream(phrase_detector, extract_func=extract_docid, fz_docs=False, reshuffles=epochs-1),
     name="DOCID",
-    dataset_name="CASEREPORT+PMI"+str(pmi_level),
+    dataset_name="CASEREPORT",
     epochs=epochs,
-    dimension=30)
+    dimension=40)
 
 doc_index = DocIndex(CaseReportLibrary(), "CASEREPORT")
-
 
 
 """
@@ -47,6 +46,7 @@ vec_query1 = m.infer_doc_vector("bleeding from colon, bloody stool, abdominal pa
 vec_query2 = m.infer_doc_vector("memory loss, cognitive and functional difficulties, mild cognitive impairment.", steps=50)
 vec_query3 = m.infer_doc_vector("tender warm swollen joints, morning stiffness", steps=50)
 vec_query4 = m.infer_doc_vector("fever, sore throat, muscular pain, and headaches, vomiting, diarrhea and rash, decreased liver function, external and internal bleeding",steps=50)
+vec_query5 = m.infer_doc_vector("Jewish boy age 16, monthly seizures, sleep deficiency, aggressive and irritable when woken, highly increased sexual appetite and hunger",steps=50)
 
 """
 print "lung cancer", 1-cosine(vec_lung_cancer, vec_query1), 1-cosine(vec_lung_cancer, vec_query2)
@@ -77,7 +77,8 @@ for word in m.inner_model.vocab:
 def normalize(array):
     np.linalg.norm(array)*1.0/array
 
-case_id = 'DOCID-CS3471415'
+case_id = 'DOCID-CS3471415' # duodenal hematoma
+case_id = 'DOCID-CS2644621' # brain tumor?
 case_vec = m.inner_model[case_id]
 
 """
@@ -94,7 +95,7 @@ ranking = []
 for word in m.inner_model.vocab:
     if word.startswith("DOCID-CS"):
         doc_vec = m.inner_model[word]
-        distance = cosine(case_vec, doc_vec)
+        distance = cosine(vec_query2, doc_vec)
         heappush(ranking, (distance, word))
         #print "added", doc_index[word]
 
