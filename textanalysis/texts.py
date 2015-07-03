@@ -10,6 +10,7 @@ from os.path import isfile, join
 import json
 from random import shuffle
 from entityextractor import DiseaseExtractor
+from detectlang import detect_english
 
 
 class SentenceStream(object):
@@ -75,7 +76,8 @@ class Document(object):
 
 
 class CaseReportLibrary(object):
-    def __init__(self, filename=None, cs_path=r"C:\Users\matias\Desktop\thesis\data\casereports", reshuffles=0):
+    def __init__(self, filename=None, cs_path=r"C:\Users\matias\Desktop\thesis\data\casereports", reshuffles=0, block_nonenglish=False):
+        self.block_nonenglish = block_nonenglish
         if filename is not None:
             self.filenames = [filename]
         else:
@@ -113,6 +115,8 @@ class CaseReportLibrary(object):
             if keywords is not None:
                 keywords = [ET.tostring(kwd, encoding='utf8', method='text') for kwd in keywords]
             body_node = root.find('./body')
+            if self.block_nonenglish and not detect_english(abstract):
+                continue
             if body_node is not None and _id is not None:
                 body = ET.tostring(body_node, encoding='utf8', method='text').replace("\n", " ")
                 yield CaseReport(_id, pmcid, title, body, filename, keywords, abstract)
